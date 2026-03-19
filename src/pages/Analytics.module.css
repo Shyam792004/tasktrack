@@ -1,0 +1,336 @@
+.analyticsPage {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    animation: fadeIn 0.4s ease-out;
+    padding-bottom: 40px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+}
+
+.dateTag {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 6px 16px;
+}
+
+.summaryWidgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.widget {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+}
+
+.widgetIcon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.widgetLabel {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.widgetValue {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.widgetSub {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Vitality Section with Split Circles */
+.vitalitySection {
+    width: 100%;
+}
+
+.vitalityCard {
+    padding: 24px;
+}
+
+.vitalityCircles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.circleContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.circleHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.svgWrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.svgCircle {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circleBg {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.05);
+    stroke-width: 8;
+}
+
+.circleFill {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s ease;
+}
+
+.circleText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.circleValue {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.circleSubValue {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.circleFooter {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Charts Grid */
+.chartsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+}
+
+.chartCard {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chartTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chartWrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.priorityCircles {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+/* Plan Section */
+.planSection {
+    padding: 24px;
+}
+
+.planHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.planStats {
+    display: flex;
+    gap: 12px;
+}
+
+.taskCountBadge,
+.habitCountBadge,
+.moneyCountBadge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+}
+
+.taskCountBadge {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.habitCountBadge {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.moneyCountBadge {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+}
+
+.planGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+}
+
+@media (max-width: 1024px) {
+    .planGrid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+}
+
+.planColumn h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.planItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.planItem:last-child {
+    border-bottom: none;
+}
+
+.statusDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border-color);
+}
+
+.statusDone {
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.nameDone {
+    color: var(--text-secondary);
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.planTime {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    min-width: 45px;
+}
+
+.planName {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.priorityMini {
+    font-size: 10px;
+    font-weight: 900;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+.emptyMsg {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: 8px 0;
+}

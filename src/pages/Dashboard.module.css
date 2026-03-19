@@ -1,0 +1,433 @@
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.scoreCard {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+    padding: 16px 24px;
+    border-radius: var(--border-radius-lg);
+    color: white;
+    gap: 16px;
+    box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
+}
+
+.scoreInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.scoreLabel {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.scoreValue {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.scoreIcon {
+    opacity: 0.8;
+}
+
+.insightsWrapper {
+    margin-bottom: 8px;
+}
+
+.insightCard {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(139, 92, 246, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    border-radius: 12px;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.insightIcon {
+    color: #8b5cf6;
+}
+
+.insightText {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.mainGrid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 1024px) {
+    .mainGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dashboardLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.focusCard {
+    padding: 32px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.focusCard::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+}
+
+.focusHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.focusTag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #8b5cf6;
+    letter-spacing: 1px;
+}
+
+.priorityBadge {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.focusTitle {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    line-height: 1.2;
+}
+
+.focusDetails {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    font-size: 1rem;
+}
+
+.focusActionBtn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.focusActionBtn:hover {
+    background: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.statCard {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.statHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.statTitle {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.statValue {
+    font-size: 1.75rem;
+    font-weight: 800;
+}
+
+.iconWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.financialPulse {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.pulseHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pulseTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.quickAddBtn {
+    background: none;
+    border: none;
+    color: #8b5cf6;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.quickAddBtn:hover {
+    transform: scale(1.1);
+}
+
+.pulseContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.pulseMetric {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pulseLabel {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.pulseValue {
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.pulseBar {
+    width: 100%;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.pulseFill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899);
+    border-radius: 6px;
+    transition: width 1s ease-out;
+}
+
+.pulseNote {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.dashboardRight {
+    display: flex;
+    flex-direction: column;
+}
+
+.listCard {
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.listHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.taskList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.taskItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.taskItem:hover {
+    transform: translateX(4px);
+    border-color: #8b5cf6;
+}
+
+.taskText {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.highPriority {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.mediumPriority {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.lowPriority {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.goalList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.goalItem {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.goalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.goalTitle {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.goalText {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #8b5cf6;
+}
+
+.progressBar {
+    width: 100%;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease-out;
+}
+
+.emptyMsg {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 20px;
+    font-style: italic;
+    font-size: 0.9rem;
+}

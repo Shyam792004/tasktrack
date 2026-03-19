@@ -1,0 +1,285 @@
+.timerPage {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    animation: fadeIn 0.4s ease-out;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+}
+
+.timerContainer {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 800px) {
+    .timerContainer {
+        grid-template-columns: 1fr;
+    }
+}
+
+.timerCard {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.taskSelectorWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--bg-primary);
+    padding: 12px 16px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 24px;
+    width: 100%;
+    max-width: 320px;
+    transition: border-color 0.2s;
+}
+
+.taskSelectorWrapper:focus-within {
+    border-color: var(--accent-primary);
+}
+
+.taskIcon {
+    color: var(--text-secondary);
+}
+
+.taskSelect {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    outline: none;
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+}
+
+.taskSelect option {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.modeTabsWrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.durationSelect {
+    padding: 10px 16px;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s;
+}
+
+.durationSelect:hover {
+    border-color: var(--accent-primary);
+}
+
+.modeTabs {
+    display: flex;
+    gap: 16px;
+    background-color: var(--bg-primary);
+    padding: 6px;
+    border-radius: var(--border-radius-lg);
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 24px;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.activeTab {
+    background-color: var(--accent-primary);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.breakActiveTab {
+    background-color: var(--accent-success);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.circularProgress {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 48px;
+}
+
+.progressCircle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circleBg {
+    fill: none;
+    stroke: var(--border-color);
+    stroke-width: 3;
+}
+
+.circleFill {
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear, stroke 0.3s;
+}
+
+.timeDisplay {
+    font-size: 4rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+    font-variant-numeric: tabular-nums;
+    z-index: 10;
+    color: var(--text-primary);
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.mainBtn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.mainBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.playBtn {
+    background-color: var(--accent-primary);
+}
+
+.playIcon {
+    margin-left: 4px;
+}
+
+.pauseBtn {
+    background-color: var(--accent-warning);
+}
+
+.resetBtn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+}
+
+.resetBtn:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+    transform: rotate(-30deg);
+}
+
+.statsCard {
+    padding: 32px 24px;
+}
+
+.statsCard h3 {
+    font-size: 1.2rem;
+    margin-bottom: 24px;
+}
+
+.statList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.statValue {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.statValueHighlight {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+}

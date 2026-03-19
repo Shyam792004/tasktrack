@@ -1,0 +1,1211 @@
+/* ── Page Wrapper ── */
+.healthPage {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    animation: fadeIn 0.4s ease-out;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Header ── */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+}
+
+.dateTag {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 4px 14px;
+}
+
+/* ── Summary Card ── */
+.summaryCard {
+    padding: 24px;
+}
+
+.sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.ringsRow {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.ring {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.ringLabel {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.macroNumbers {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.macroNum {
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+/* ── Two Column Layout ── */
+.twoCol {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 850px) {
+    .twoCol {
+        grid-template-columns: 1fr;
+    }
+}
+
+.leftCol,
+.rightCol {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.card {
+    padding: 22px;
+}
+
+.cardSub {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 4px 0 16px;
+}
+
+/* ── Water Tracker ── */
+.waterHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.waterHeader .sectionTitle {
+    margin-bottom: 0;
+}
+
+.waterGoalInput {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.waterGoalNum {
+    width: 52px;
+    padding: 4px 8px;
+    border: 1px solid #06b6d4;
+    border-radius: 8px;
+    background: rgba(6, 182, 212, 0.06);
+    color: #06b6d4;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.waterGoalNum:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.25);
+}
+
+
+.waterGlasses {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.glass {
+    font-size: 1.4rem;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.3;
+    filter: grayscale(1);
+}
+
+.glassFilled {
+    opacity: 1;
+    filter: none;
+    border-color: #06b6d4;
+    background: rgba(6, 182, 212, 0.08);
+    transform: scale(1.05);
+}
+
+.waterBar {
+    height: 8px;
+    background: var(--bg-primary);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.waterFill {
+    height: 100%;
+    background: linear-gradient(to right, #06b6d4, #0ea5e9);
+    border-radius: 10px;
+    transition: width 0.4s ease;
+}
+
+.waterBtns {
+    display: flex;
+    gap: 10px;
+}
+
+.waterBtn {
+    flex: 1;
+    padding: 8px;
+    border-radius: var(--border-radius-md);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+.waterBtn:hover {
+    background: var(--bg-secondary);
+}
+
+.waterBtnAdd {
+    background: rgba(6, 182, 212, 0.1);
+    border-color: #06b6d4;
+    color: #06b6d4;
+}
+
+.waterBtnAdd:hover {
+    background: rgba(6, 182, 212, 0.2);
+}
+
+/* ── BMI ── */
+.bmiInputs {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.bmiField {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bmiField label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.bmiInput {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.bmiInput:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+.bmiResult {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+    padding: 14px;
+    background: var(--bg-primary);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.bmiValue {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.bmiCategory {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.bmiScale {
+    flex: 1;
+    position: relative;
+}
+
+.bmiScaleBar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.bmiRanges {
+    display: flex;
+    height: 6px;
+    border-radius: 6px;
+    overflow: hidden;
+    gap: 1px;
+}
+
+.bmiRanges>div {
+    border-radius: 3px;
+}
+
+.bmiPointer {
+    position: absolute;
+    bottom: -3px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 3px solid;
+    background: var(--bg-secondary);
+    transform: translateX(-50%);
+    transition: left 0.4s ease;
+}
+
+.bmiTips {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+}
+
+.bmiTip {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+}
+
+/* ── Sleep ── */
+.sleepInput {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.sleepHourInput {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.sleepHourInput:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.sleepSelect {
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.sleepLogBtn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 14px;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sleepLogBtn:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+}
+
+.sleepStats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.sleepStat {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sleepStat span:last-child {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+}
+
+.sleepStatVal {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: capitalize;
+}
+
+.sleepHistory {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sleepRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+}
+
+.sleepDate {
+    width: 50px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.sleepBarWrap {
+    flex: 1;
+    background: var(--bg-primary);
+    height: 6px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.sleepBar {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.3s;
+}
+
+.sleepHour {
+    width: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.sleepQBadge {
+    width: 44px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+/* ── Meal Logger ── */
+.mealBlock {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.mealHeader {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--bg-primary);
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: background 0.2s;
+}
+
+.mealHeader:hover {
+    background: var(--bg-secondary);
+}
+
+.mealIcon {
+    font-size: 1.1rem;
+}
+
+.mealLabel {
+    flex: 1;
+    text-align: left;
+}
+
+.mealCal {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.mealEntries {
+    padding: 10px 14px 14px;
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.emptyMeal {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 8px 0;
+}
+
+.entryRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+}
+
+.entryName {
+    flex: 1;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.entryMacros {
+    display: flex;
+    gap: 8px;
+    font-size: 0.73rem;
+    font-weight: 600;
+}
+
+.entryCal {
+    font-weight: 700;
+    color: #ef4444;
+    font-size: 0.82rem;
+    white-space: nowrap;
+}
+
+.removeEntry {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    transition: color 0.2s;
+}
+
+.removeEntry:hover {
+    color: #ef4444;
+}
+
+.addEntryForm {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.foodInput {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.macroInputs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+.macroInput {
+    padding: 6px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    width: 100%;
+}
+
+.foodInput:focus,
+.macroInput:focus {
+    outline: none;
+    border-color: #10b981;
+}
+
+.formActions {
+    display: flex;
+    gap: 8px;
+}
+
+.confirmBtn {
+    flex: 1;
+    padding: 7px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+}
+
+.confirmBtn:hover {
+    background: #059669;
+}
+
+.cancelBtn {
+    padding: 7px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+    color: var(--text-primary);
+}
+
+.addFoodBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 8px;
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.addFoodBtn:hover {
+    border-color: #10b981;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+}
+
+/* ── Library Manager ── */
+.mealTrackerHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.manageBtn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.manageBtn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.manageBtnActive {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: #a855f7;
+    color: #a855f7;
+}
+
+.libraryManager {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.libraryManager h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.libraryAddForm {
+    background: var(--bg-primary);
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.libraryAddForm input {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.libMacros {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.libActions {
+    display: flex;
+    gap: 8px;
+}
+
+.libSaveBtn {
+    flex: 1;
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.libCancelBtn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.libraryList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.libItem {
+    background: var(--bg-primary);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.libInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.libInfo strong {
+    font-size: 0.85rem;
+}
+
+.libInfo span {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.libItemBtns {
+    display: flex;
+    gap: 6px;
+}
+
+.libItemBtns button {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.libItemBtns button:hover {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+}
+
+.cancelLink {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* ── Tips ── */
+.tipsCard {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+}
+
+.tipsList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-left: 4px;
+    list-style: none;
+    margin: 0;
+}
+
+.tipsList li {
+    font-size: 0.87rem;
+    color: var(--text-primary);
+    padding: 8px 12px;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    border-left: 3px solid #6366f1;
+    line-height: 1.5;
+}
+
+/* ── AI Panel ── */
+.aiPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.aiInputGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.aiInputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.aiInputGroup label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-left: 2px;
+}
+
+.aiInput {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid #a855f7;
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.86rem;
+}
+
+.aiInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+}
+
+.aiInput:disabled {
+    opacity: 0.6;
+}
+
+.aiAnalyzeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.86rem;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.2s;
+}
+
+.aiAnalyzeBtn:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.aiAnalyzeBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.aiSpinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+.aiError {
+    font-size: 0.78rem;
+    color: #ef4444;
+    margin: 0;
+}
+
+.aiHint {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 0;
+    font-style: italic;
+    text-align: center;
+}
+
+/* ── AI Result Card ── */
+.aiResultCard {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(168, 85, 247, 0.05);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 10px;
+}
+
+.aiResultHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.aiResultName {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.aiResultSub {
+    font-size: 0.73rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.changeFoodBtn {
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #a855f7;
+    background: rgba(168, 85, 247, 0.08);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.changeFoodBtn:hover {
+    background: rgba(168, 85, 247, 0.16);
+}
+
+/* Nutrition preview boxes */
+.nutritionPreview {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.nutriBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    background: var(--bg-primary);
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+
+.nutriBox span:first-child {
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.nutriBox span:last-child {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.nutriInput {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-size: 1rem;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1;
+    padding: 0;
+    outline: none;
+}
+
+.nutriInput::-webkit-outer-spin-button,
+.nutriInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.formActions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.confirmBtn {
+    flex: 1;
+    padding: 8px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.cancelBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.cancelLink {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-align: center;
+    padding: 4px 0;
+    text-decoration: underline;
+}
+
+.cancelLink:hover {
+    color: var(--text-primary);
+}
+
+/* ── Step Tracker ── */
+.stepInputArea {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.stepInputField {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stepInputField label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.calorieBurnInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.burnVal {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #10b981;
+    line-height: 1.1;
+}
+
+.burnLabel {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stepProgressContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stepProgressHeader {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.stepProgressBar {
+    height: 10px;
+    background: var(--bg-primary);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.stepProgressFill {
+    height: 100%;
+    background: linear-gradient(to right, #10b981, #059669);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}

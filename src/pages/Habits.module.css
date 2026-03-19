@@ -1,0 +1,999 @@
+.habitsPage {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    animation: fadeIn 0.4s ease-out;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.twoColLayout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.habitColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+.columnHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+}
+
+.columnTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.flexTitle {
+    color: #10b981;
+}
+
+.columnSubtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.flexAddBtn {
+    background-color: #10b981 !important;
+}
+
+.flexAddBtn:hover {
+    background-color: #059669 !important;
+}
+
+.flexTitleCol {
+    flex: 2;
+    min-width: 120px;
+}
+
+.flexTitleColMain {
+    flex: 2;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+}
+
+.flexSubmitBtn {
+    background-color: #10b981 !important;
+}
+
+/* ── Day Progress Circle Row ── */
+.dayProgressRow {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 16px 8px 8px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-color);
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.circleWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: var(--border-radius-md);
+    transition: background-color 0.2s, transform 0.15s;
+    flex: 1;
+    min-width: 60px;
+}
+
+.circleWrap:hover {
+    background-color: rgba(99, 102, 241, 0.08);
+    transform: translateY(-2px);
+}
+
+.circleSelected {
+    background-color: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.circleDayLabel {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.circleDetail {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    text-align: center;
+    margin-top: 2px;
+}
+
+/* ── Day Detail Panel ── */
+.dayDetailPanel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 16px;
+    animation: fadeIn 0.25s ease-out;
+}
+
+.dayDetailHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dayDetailTitle {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.dayDetailClose {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    padding: 2px 8px;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.dayDetailClose:hover {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.dayDetailList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dayDetailItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--border-radius-md);
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+    transition: background-color 0.2s;
+}
+
+.dayDetailDone {
+    background-color: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.dayDetailPending {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-color: var(--border-color);
+}
+
+.dayDetailIcon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.dayDetailName {
+    flex: 1;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.dayDetailStatus {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+
+.dayDetailDone .dayDetailStatus {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.dayDetailPending .dayDetailStatus {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+}
+
+.overviewBadge {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: var(--bg-secondary);
+    padding: 12px 20px;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.flameIcon {
+    color: var(--accent-warning);
+}
+
+.overviewText {
+    display: flex;
+    flex-direction: column;
+}
+
+.overviewText span {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.overviewText strong {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.addHabitCard {
+    padding: 16px 24px;
+}
+
+.addForm {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.habitInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--border-color);
+    padding: 12px 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.habitInput:focus {
+    border-color: var(--accent-primary);
+}
+
+.timeInput {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--border-color);
+    padding: 12px 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    width: 120px;
+}
+
+.timeInput:focus {
+    border-color: var(--accent-primary);
+}
+
+.addBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background-color: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.addBtn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.addBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.habitsContainer {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tableHeader {
+    display: flex;
+    padding: 16px 24px;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.habitSNoCol {
+    width: 60px;
+    text-align: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+    padding-right: 8px;
+}
+
+.habitTitleCol {
+    flex: 2;
+    min-width: 150px;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+    padding-right: 8px;
+}
+
+.habitTimeCol {
+    width: 140px;
+    text-align: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+    padding-right: 8px;
+}
+
+.habitCompleteCol {
+    width: 100px;
+    text-align: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+    padding-right: 8px;
+}
+
+.daysCol {
+    width: 308px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    display: grid;
+    grid-template-columns: repeat(7, 44px);
+    gap: 0px;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.habitActionCol {
+    width: 80px;
+    text-align: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.streakCol {
+    flex: 1;
+    text-align: right;
+    min-width: 80px;
+}
+
+.dayHead {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border-radius: 8px;
+    padding: 4px 2px;
+    transition: background-color 0.2s;
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.selectedDayHead {
+    background-color: rgba(99, 102, 241, 0.12);
+    border-radius: 8px;
+    outline: 2px solid rgba(99, 102, 241, 0.4);
+}
+
+.selectedDayHead .dayNum {
+    color: #6366f1;
+}
+
+.dayNum {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.habitsList {
+    display: flex;
+    flex-direction: column;
+}
+
+.habitRow {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+}
+
+.habitRow:last-child {
+    border-bottom: none;
+}
+
+.habitRow:hover {
+    background-color: rgba(59, 130, 246, 0.02);
+}
+
+.habitRowSelected {
+    background-color: rgba(99, 102, 241, 0.06) !important;
+    border-left: 3px solid #6366f1;
+}
+
+.habitSNoColMain {
+    width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.habitSerial {
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.habitTitleColMain {
+    flex: 2;
+    min-width: 150px;
+    padding-right: 16px;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.habitName {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.habitTimeColMain {
+    width: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.habitTime {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.habitCompleteColMain {
+    width: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.completeCheckbox {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.completeCheckbox:checked {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.completeCheckbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 7px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Historical (past-day) checkbox — read-only look */
+.historicalCheckbox {
+    opacity: 0.75;
+    cursor: default;
+}
+
+.historicalCheckbox:checked {
+    background-color: #6366f1;
+    /* Purple for past-day view */
+    border-color: #6366f1;
+}
+
+/* Small badge in Done column when viewing a past day */
+.viewingDayBadge {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #6366f1;
+    background-color: rgba(99, 102, 241, 0.1);
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.daysColMain {
+    width: 308px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    display: grid;
+    grid-template-columns: repeat(7, 44px);
+    gap: 0px;
+    justify-items: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.habitActionColMain {
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.streakColMain {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    min-width: 80px;
+}
+
+.dayCheckbox {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background-color: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    transition: all 0.2s;
+}
+
+.selectedDayCol {
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.dayCheckbox:hover {
+    border-color: var(--accent-primary);
+}
+
+.todayBox {
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.completed {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+}
+
+.xIcon {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.dayCheckbox:not(.completed):hover .xIcon {
+    opacity: 0.2;
+    color: var(--text-secondary);
+}
+
+.streakBadge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+}
+
+.activeStreak {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--accent-warning);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+@media (max-width: 900px) {
+    .tableHeader {
+        display: none;
+    }
+
+    .habitRow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .streakColMain {
+        justify-content: flex-start;
+    }
+}
+
+/* Modal Styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modalContent {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: 32px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: var(--shadow-xl);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.modalHeader h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.closeBtn:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.modalForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formGroup label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.formRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.input {
+    width: 100%;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: var(--border-radius-md);
+    padding: 12px 16px;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+.cancelBtn {
+    padding: 10px 20px;
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.cancelBtn:hover {
+    background-color: var(--bg-secondary);
+}
+
+.submitBtn {
+    padding: 10px 24px;
+    background-color: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.submitBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ── Streak clickable ── */
+.streakClickable {
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.streakClickable:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+}
+
+/* ── Habit Activity Calendar Modal ── */
+.calModalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.calModal {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-color);
+    padding: 28px;
+    width: 100%;
+    max-width: 780px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: fadeIn 0.25s ease-out;
+}
+
+.calModalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.calModalTitle {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+}
+
+.calModalSub {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.calModalClose {
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+}
+
+.calModalClose:hover {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.calGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.calMonth {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.calMonthTitle {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.calDowRow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.calDow {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.calDaysGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.calDay {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    cursor: default;
+    transition: transform 0.1s;
+}
+
+.calDay:hover {
+    transform: scale(1.2);
+}
+
+.calDayDone {
+    background-color: #10b981;
+    color: #fff;
+}
+
+.calDayMiss {
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.calDayEmpty {
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.calDayToday {
+    outline: 2px solid #6366f1;
+    outline-offset: 1px;
+}
+
+.calLegend {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border-color);
+    padding-top: 14px;
+}
+
+.calLegendBox {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+}

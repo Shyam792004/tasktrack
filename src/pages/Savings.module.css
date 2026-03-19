@@ -1,0 +1,584 @@
+.savingsPage {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    animation: fadeIn 0.4s ease-out;
+    padding-bottom: 40px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+}
+
+.addBtn {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.addBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+
+.summaryCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.summaryCard {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.summaryIcon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.summaryLabel {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.summaryValue {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.goalsContainer {
+    display: flex;
+    gap: 32px;
+    margin-top: 32px;
+    align-items: flex-start;
+}
+
+.goalColumn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+}
+
+.columnHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.columnTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.achBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.achBtn:hover {
+    background: rgba(245, 158, 11, 0.2);
+    transform: translateY(-1px);
+}
+
+.goalsList {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.emptyColumn {
+    padding: 40px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    border: 2px dashed var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.goalCard {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.goalCard:hover {
+    transform: translateY(-4px);
+}
+
+.goalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.headerActions {
+    display: flex;
+    gap: 8px;
+}
+
+.iconBtn {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+}
+
+.iconBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    opacity: 1;
+    color: #8b5cf6;
+}
+
+.iconBtn:last-child:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.goalInfo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.goalIconWrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.goalTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.goalTarget {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.deleteBtn {
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: all 0.2s ease;
+}
+
+.deleteBtn:hover {
+    opacity: 1;
+    color: #ef4444;
+}
+
+.progressSection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.progressLabels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.currentAmountGroup {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.inlineEditBtn {
+    background: none;
+    border: none;
+    padding: 2px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+    transition: all 0.2s ease;
+}
+
+.inlineEditBtn:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.05);
+    color: #8b5cf6;
+}
+
+.currentAmount {
+    color: var(--text-primary);
+}
+
+.percentage {
+    color: #8b5cf6;
+}
+
+.progressBar {
+    height: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+}
+
+.topUpBtn {
+    flex: 1;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.topUpBtn:hover {
+    background: var(--border-color);
+}
+
+/* Modal Styling */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    width: 100%;
+    max-width: 500px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    animation: modalSlideUp 0.3s ease-out;
+}
+
+.achievementsModal {
+    background: aliceblue !important;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.modalNote {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-top: -16px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.formGroup label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.formGroup input,
+.formGroup input,
+.formGroup select {
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+.iconGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.iconOption {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    background: var(--bg-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+}
+
+.iconOption:hover {
+    border-color: var(--text-secondary);
+}
+
+.iconOptionActive {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+    color: #10b981;
+}
+
+.colorGrid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.colorOption {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 3px solid transparent;
+}
+
+.colorOptionActive {
+    border-color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+.modalActions {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.cancelBtn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: none;
+    color: var(--text-secondary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancelBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.submitBtn {
+    flex: 2;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.submitBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+.achievementsContent {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 8px 0;
+}
+
+.achHeader {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.achList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.achItem {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.achItemInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.achItemTitle {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.achItemPerc {
+    font-weight: 700;
+}
+
+.achProgressBar {
+    height: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.achProgressFill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+}
+
+@media (max-width: 1024px) {
+    .goalsContainer {
+        flex-direction: column;
+    }
+}
