@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Droplets, Utensils, Moon, Scale, Plus, Trash2, X, ChevronDown, ChevronUp, Flame, Settings, Edit, Save, Footprints } from 'lucide-react';
+import { Droplets, Utensils, Moon, Scale, Plus, Trash2, ChevronDown, ChevronUp, Flame, Settings, Edit, Save, Footprints } from 'lucide-react';
 import { format } from 'date-fns';
 import styles from './Health.module.css';
 
