@@ -2,82 +2,76 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Calendar, Flag, CheckCircle2, Circle, GripVertical } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { format } from 'date-fns';
+import { subscribeToTasks, addTask, updateTask, deleteTask } from '../services/dataService';
 import styles from './Tasks.module.css';
 
-import { initialTasks } from '../data/mockTasks';
 import type { Task } from '../data/mockTasks';
 
 export function Tasks() {
-    const [tasks, setTasks] = useState<Task[]>(() => {
-        const saved = localStorage.getItem('tracktrack_tasks');
-        return saved ? JSON.parse(saved) : initialTasks;
-    });
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        localStorage.setItem('tracktrack_tasks', JSON.stringify(tasks));
-        window.dispatchEvent(new Event('tasksUpdate'));
-    }, [tasks]);
+        const unsubscribe = subscribeToTasks((fetchedTasks) => {
+            setTasks(fetchedTasks);
+            setIsLoading(false);
+        });
+        return () => unsubscribe();
+    }, []);
 
     const [newTaskTitle, setNewTaskTitle] = useState('');
     const [newTaskPriority, setNewTaskPriority] = useState<'low' | 'medium' | 'high'>('high');
 
-    const handleAddTask = (e: React.FormEvent) => {
+    const handleAddTask = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newTaskTitle.trim()) return;
 
-        const newTask: Task = {
-            id: Date.now().toString(),
+        const newTask = {
             title: newTaskTitle,
             completed: false,
             priority: newTaskPriority,
             dueDate: new Date().toISOString()
         };
-        setTasks([newTask, ...tasks]);
-        setNewTaskTitle('');
+        
+        try {
+            await addTask(newTask);
+            setNewTaskTitle('');
+        } catch (error) {
+            console.error("Error adding task:", error);
+        }
     };
 
-    const toggleTask = (id: string) => {
-        setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+    const toggleTask = async (id: string, completed: boolean) => {
+        try {
+            await updateTask(id, { completed: !completed });
+        } catch (error) {
+            console.error("Error toggling task:", error);
+        }
     };
 
-    const deleteTask = (id: string) => {
-        setTasks(tasks.filter(t => t.id !== id));
+    const handleDeleteTask = async (id: string) => {
+        try {
+            await deleteTask(id);
+        } catch (error) {
+            console.error("Error deleting task:", error);
+        }
     };
 
-    const onDragEnd = (result: DropResult) => {
-        const { source, destination } = result;
+    const onDragEnd = async (result: DropResult) => {
+        const { source, destination, draggableId } = result;
         if (!destination) return;
         if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
-        const updatedTasks = [...tasks];
-        const sourcePriority = source.droppableId as 'low' | 'medium' | 'high';
         const destPriority = destination.droppableId as 'low' | 'medium' | 'high';
-
-        // 1. Filter out the tasks belonging to the source priority group
-        const sourceGroup = updatedTasks.filter(t => t.priority === sourcePriority);
-        // 2. Remove the dragged task from its old position in that group
-        const [movedTask] = sourceGroup.splice(source.index, 1);
         
-        // 3. Update the task's priority
-        movedTask.priority = destPriority;
-
-        // 4. Get the target group (could be same as source)
-        // If same group, use the already modified sourceGroup
-        // If different group, filter from updatedTasks (excluding the movedTask)
-        let finalTasks: Task[];
-        if (sourcePriority === destPriority) {
-            sourceGroup.splice(destination.index, 0, movedTask);
-            // Reconstruct tasks: replace all tasks of this priority with the new ordered group
-            const others = updatedTasks.filter(t => t.priority !== sourcePriority);
-            finalTasks = [...others, ...sourceGroup];
-        } else {
-            const destGroup = updatedTasks.filter(t => t.priority === destPriority && t.id !== movedTask.id);
-            destGroup.splice(destination.index, 0, movedTask);
-            const others = updatedTasks.filter(t => t.priority !== sourcePriority && t.priority !== destPriority);
-            finalTasks = [...others, ...sourceGroup, ...destGroup];
+        if (source.droppableId !== destination.droppableId) {
+            // Update priority in Firestore
+            try {
+                await updateTask(draggableId, { priority: destPriority });
+            } catch (error) {
+                console.error("Error updating priority after drag:", error);
+            }
         }
-
-        setTasks(finalTasks);
     };
 
     const highTasks = tasks.filter(t => t.priority === 'high');
@@ -95,18 +89,18 @@ export function Tasks() {
                     <div {...provided.dragHandleProps} className={styles.dragHandle}>
                         <GripVertical size={18} />
                     </div>
-                    <button className={styles.checkButton} onClick={() => toggleTask(task.id)}>
+                    <button className={styles.checkButton} onClick={() => toggleTask(task.id, task.completed)}>
                         {task.completed ? <CheckCircle2 size={24} className={styles.checkedIcon} /> : <Circle size={24} className={styles.uncheckedIcon} />}
                     </button>
                     <div className={styles.taskContent}>
                         <span className={styles.taskTitle}>{task.title}</span>
                         <div className={styles.taskMeta}>
                             <span className={styles.metaBadge}>
-                                <Calendar size={14} /> {format(new Date(task.dueDate), 'MMM d')}
+                                <Calendar size={14} /> {task.dueDate ? format(new Date(task.dueDate), 'MMM d') : 'No date'}
                             </span>
                         </div>
                     </div>
-                    <button className={styles.deleteButton} onClick={() => deleteTask(task.id)}>
+                    <button className={styles.deleteButton} onClick={() => handleDeleteTask(task.id)}>
                         <Trash2 size={18} />
                     </button>
                 </div>
@@ -140,8 +134,8 @@ export function Tasks() {
                             <option value="medium">Medium Priority</option>
                             <option value="low">Low Priority</option>
                         </select>
-                        <button type="submit" className={styles.addButton} disabled={!newTaskTitle.trim()}>
-                            <Plus size={18} /> Add Task
+                        <button type="submit" className={styles.addButton} disabled={!newTaskTitle.trim() || isLoading}>
+                            <Plus size={18} /> {isLoading ? 'Working...' : 'Add Task'}
                         </button>
                     </div>
                 </form>

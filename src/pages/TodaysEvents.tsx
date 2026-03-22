@@ -2,69 +2,49 @@ import { useState, useEffect } from 'react';
 import { CheckCircle2, Circle, Calendar, Flag, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
+import { subscribeToTasks, subscribeToCalendarEvents, updateTask, updateCalendarEvent } from '../services/dataService';
 import styles from './TodaysEvents.module.css';
 
 export function TodaysEvents() {
     const [tasks, setTasks] = useState<any[]>([]);
-
-    const loadTasks = () => {
-        let items: any[] = [];
-        const today = format(new Date(), 'yyyy-MM-dd');
-
-        // Load tasks
-        const savedTasks = localStorage.getItem('tracktrack_tasks');
-        if (savedTasks) {
-            const allTasks: any[] = JSON.parse(savedTasks);
-            const filteredTasks = allTasks.filter(t => t.dueDate && format(new Date(t.dueDate), 'yyyy-MM-dd') === today).map(t => ({...t, displayType: 'Task'}));
-            items = [...items, ...filteredTasks];
-        }
-
-        // Load calendar events
-        const savedEvents = localStorage.getItem('tracktrack_calendar_events');
-        if (savedEvents) {
-            const allEvents: any[] = JSON.parse(savedEvents);
-            const filteredEvents = allEvents.filter(e => e.date && format(new Date(e.date), 'yyyy-MM-dd') === today).map(e => ({...e, displayType: 'Event'}));
-            items = [...items, ...filteredEvents];
-        }
-
-        setTasks(items);
-    };
+    const [events, setEvents] = useState<any[]>([]);
+    const [displayItems, setDisplayItems] = useState<any[]>([]);
 
     useEffect(() => {
-        loadTasks();
-        window.addEventListener('storage', loadTasks);
-        window.addEventListener('tasksUpdate', loadTasks);
+        const unsubTasks = subscribeToTasks(setTasks);
+        const unsubEvents = subscribeToCalendarEvents(setEvents);
         return () => {
-            window.removeEventListener('storage', loadTasks);
-            window.removeEventListener('tasksUpdate', loadTasks);
+            unsubTasks();
+            unsubEvents();
         };
     }, []);
 
-    const toggleTask = (id: string) => {
-        // Try tasks first
-        const savedTasks = localStorage.getItem('tracktrack_tasks');
-        if (savedTasks) {
-            const allTasks: any[] = JSON.parse(savedTasks);
-            const taskIndex = allTasks.findIndex(t => t.id === id);
-            if (taskIndex > -1) {
-                allTasks[taskIndex].completed = !allTasks[taskIndex].completed;
-                localStorage.setItem('tracktrack_tasks', JSON.stringify(allTasks));
-                window.dispatchEvent(new Event('tasksUpdate'));
-                return;
-            }
-        }
+    useEffect(() => {
+        const today = format(new Date(), 'yyyy-MM-dd');
+        
+        const todaysTasks = tasks
+            .filter(t => t.dueDate && format(new Date(t.dueDate), 'yyyy-MM-dd') === today)
+            .map(t => ({ ...t, displayType: 'Task' }));
 
-        // Try calendar events
-        const savedEvents = localStorage.getItem('tracktrack_calendar_events');
-        if (savedEvents) {
-            const allEvents: any[] = JSON.parse(savedEvents);
-            const eventIndex = allEvents.findIndex(e => e.id === id);
-            if (eventIndex > -1) {
-                allEvents[eventIndex].completed = !allEvents[eventIndex].completed;
-                localStorage.setItem('tracktrack_calendar_events', JSON.stringify(allEvents));
-                window.dispatchEvent(new Event('tasksUpdate'));
-                return;
+        const todaysEvents = events
+            .filter(e => e.date && format(new Date(e.date), 'yyyy-MM-dd') === today)
+            .map(e => ({ ...e, displayType: 'Event' }));
+
+        setDisplayItems([...todaysTasks, ...todaysEvents]);
+    }, [tasks, events]);
+
+    const toggleTask = async (id: string) => {
+        const item = displayItems.find(i => i.id === id);
+        if (!item) return;
+
+        try {
+            if (item.displayType === 'Task') {
+                await updateTask(id, { completed: !item.completed });
+            } else {
+                await updateCalendarEvent(id, { completed: !item.completed });
             }
+        } catch (error) {
+            console.error("Error toggling item:", error);
         }
     };
 
@@ -78,9 +58,9 @@ export function TodaysEvents() {
                 <p className={styles.subtitle}>{format(new Date(), 'EEEE, MMMM do, yyyy')}</p>
             </div>
 
-            {tasks.length > 0 ? (
+            {displayItems.length > 0 ? (
                 <div className={styles.taskList}>
-                    {tasks.map((task) => (
+                    {displayItems.map((task) => (
                         <div
                             key={task.id}
                             className={`glass-panel ${styles.taskItem} ${task.completed ? styles.completedTask : ''}`}

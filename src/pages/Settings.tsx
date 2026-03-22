@@ -1,30 +1,37 @@
 import { useState, useEffect } from 'react';
 import { Camera, Save, Check } from 'lucide-react';
+import { subscribeToUserSettings, updateUserSettings } from '../services/dataService';
 import styles from './Settings.module.css';
 
 export function Settings() {
     const [name, setName] = useState('User');
     const [email, setEmail] = useState('user@example.com');
     const [saved, setSaved] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        const savedUser = localStorage.getItem('tracktrack_user');
-        if (savedUser) {
-            const { name, email } = JSON.parse(savedUser);
-            setName(name);
-            setEmail(email);
-        }
+        const unsubscribe = subscribeToUserSettings((user) => {
+            if (user) {
+                setName(user.name || 'User');
+                setEmail(user.email || 'user@example.com');
+            }
+        });
+        return () => unsubscribe();
     }, []);
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        const userData = { name, email };
-        localStorage.setItem('tracktrack_user', JSON.stringify(userData));
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
-        
-        // Dispatch custom event to notify Topbar
-        window.dispatchEvent(new Event('userUpdate'));
+        setIsSaving(true);
+        try {
+            await updateUserSettings({ name, email });
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
+            window.dispatchEvent(new Event('userUpdate'));
+        } catch (error) {
+            console.error("Error saving settings:", error);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=128`;
@@ -82,9 +89,9 @@ export function Settings() {
                     </div>
 
                     <div className={styles.actions}>
-                        <button type="submit" className={styles.saveButton}>
-                            {saved ? <Check size={18} /> : <Save size={18} />}
-                            {saved ? 'Saved!' : 'Save Changes'}
+                        <button type="submit" className={styles.saveButton} disabled={isSaving}>
+                            {isSaving ? <Check size={18} /> : (saved ? <Check size={18} /> : <Save size={18} />)}
+                            {isSaving ? 'Saving...' : (saved ? 'Saved!' : 'Save Changes')}
                         </button>
                         {saved && <span className={styles.successMessage}>Settings updated successfully!</span>}
                     </div>

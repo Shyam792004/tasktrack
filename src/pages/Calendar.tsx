@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday } from 'date-fns';
+import { subscribeToCalendarEvents, addCalendarEvent } from '../services/dataService';
 import styles from './Calendar.module.css';
 
 interface CalendarEvent {
@@ -19,21 +20,22 @@ const mockEvents: CalendarEvent[] = [
 
 export function Calendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [manualEvents, setManualEvents] = useState<CalendarEvent[]>(() => {
-        const saved = localStorage.getItem('tracktrack_calendar_events');
-        if (!saved) return mockEvents;
-        const parsed = JSON.parse(saved);
-        return parsed.map((e: any) => ({ ...e, date: new Date(e.date) }));
-    });
+    const [manualEvents, setManualEvents] = useState<CalendarEvent[]>([]);
 
     const [tasks, setTasks] = useState<any[]>([]);
     const [goals, setGoals] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
-        localStorage.setItem('tracktrack_calendar_events', JSON.stringify(manualEvents));
-        window.dispatchEvent(new Event('tasksUpdate'));
-    }, [manualEvents]);
+        const unsubscribe = subscribeToCalendarEvents((fetchedEvents) => {
+            const parsed = fetchedEvents.map(e => ({
+                ...e,
+                date: new Date(e.date)
+            }));
+            setManualEvents(parsed.length > 0 ? parsed : mockEvents);
+        });
+        return () => unsubscribe();
+    }, []);
 
     useEffect(() => {
         const savedTasks = localStorage.getItem('tracktrack_tasks');
@@ -79,7 +81,7 @@ export function Calendar() {
     const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
     const jumpToToday = () => setCurrentDate(new Date());
 
-    const handleAddEvent = (e: React.FormEvent) => {
+    const handleAddEvent = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newEventTitle.trim()) return;
 
@@ -87,19 +89,22 @@ export function Calendar() {
         // Construct date correctly respecting local timezone if needed, or simply naive
         const eventDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
 
-        const newEvent: CalendarEvent = {
-            id: Date.now().toString(),
+        const newEvent = {
             title: newEventTitle,
-            date: eventDate,
+            date: eventDate.toISOString(),
             type: newEventType,
             completed: false
         };
 
-        setManualEvents([...manualEvents, newEvent]);
-        setIsModalOpen(false);
-        setNewEventTitle('');
-        setNewEventDate(format(new Date(), 'yyyy-MM-dd'));
-        setNewEventType('task');
+        try {
+            await addCalendarEvent(newEvent);
+            setIsModalOpen(false);
+            setNewEventTitle('');
+            setNewEventDate(format(new Date(), 'yyyy-MM-dd'));
+            setNewEventType('task');
+        } catch (error) {
+            console.error("Error adding calendar event:", error);
+        }
     };
 
     const renderHeader = () => {
