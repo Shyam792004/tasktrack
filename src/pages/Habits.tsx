@@ -399,7 +399,7 @@ export function Habits() {
                     {renderDayProgressRow(sortedHabits, selectedTimedDay, setSelectedTimedDay)}
 
                     <div className={`glass-panel ${styles.habitsContainer}`}>
-                        <div className={styles.tableHeader}>
+                        <div className={`${styles.tableHeader} ${styles.timedGrid}`}>
                             <div className={styles.habitSNoCol}>S.No</div>
                             <div className={styles.habitTitleCol}>Habit</div>
                             <div className={styles.habitTimeCol}>Time</div>
@@ -418,7 +418,7 @@ export function Habits() {
 
                         <div className={styles.habitsList}>
                             {sortedHabits.map((habit, index) => (
-                                <div key={habit.id} className={`${styles.habitRow} ${selectedHabitId === habit.id ? styles.habitRowSelected : ''}`}>
+                                <div key={habit.id} className={`${styles.habitRow} ${styles.timedGrid} ${selectedHabitId === habit.id ? styles.habitRowSelected : ''}`}>
                                     <div className={styles.habitSNoColMain}><span className={styles.habitSerial}>{index + 1}</span></div>
                                     <div className={styles.habitTitleColMain} onClick={() => selectHabit(habit.id, 'timed')} style={{ cursor: 'pointer' }}>
                                         <span className={styles.habitName}>{habit.title}</span>
@@ -488,7 +488,7 @@ export function Habits() {
                     {renderDayProgressRow(flexibleHabits, selectedFlexDay, setSelectedFlexDay)}
 
                     <div className={`glass-panel ${styles.habitsContainer}`}>
-                        <div className={styles.tableHeader}>
+                        <div className={`${styles.tableHeader} ${styles.flexGrid}`}>
                             <div className={styles.habitSNoCol}>S.No</div>
                             <div className={styles.flexTitleCol}>Habit</div>
                             <div className={styles.habitCompleteCol}>
@@ -506,7 +506,7 @@ export function Habits() {
 
                         <div className={styles.habitsList}>
                             {flexibleHabits.map((habit, index) => (
-                                <div key={habit.id} className={`${styles.habitRow} ${selectedHabitId === habit.id ? styles.habitRowSelected : ''}`}>
+                                <div key={habit.id} className={`${styles.habitRow} ${styles.flexGrid} ${selectedHabitId === habit.id ? styles.habitRowSelected : ''}`}>
                                     <div className={styles.habitSNoColMain}><span className={styles.habitSerial}>{index + 1}</span></div>
                                     <div className={styles.flexTitleColMain} onClick={() => selectHabit(habit.id, 'flex')} style={{ cursor: 'pointer' }}>
                                         <span className={styles.habitName}>{habit.title}</span>

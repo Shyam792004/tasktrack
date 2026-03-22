@@ -133,7 +133,8 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto;
+    min-height: 0; /* Allow flex child to shrink below content if needed, but we want it to scroll */
 }
 
 .daysRow {
@@ -162,7 +163,7 @@
 .calendarRow {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    flex: 1;
+    min-height: 120px; /* Changed from flex: 1 to fixed min-height to prevent clipping */
     border-bottom: 1px solid var(--border-color);
 }
 

@@ -11,9 +11,8 @@ import { Habits } from './pages/Habits';
 import { Health } from './pages/Health';
 import { Savings } from './pages/Savings';
 import { Analytics } from './pages/Analytics';
-
-// Placeholder Pages
-const Settings = () => <div><h2>Settings</h2></div>;
+import { Settings } from './pages/Settings';
+import { TodaysEvents } from './pages/TodaysEvents';
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -41,6 +40,7 @@ function App() {
           <Route path="/health" element={<Health />} />
           <Route path="/savings" element={<Savings />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/todays-events" element={<TodaysEvents />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </DashboardLayout>

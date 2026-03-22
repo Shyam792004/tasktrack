@@ -8,10 +8,44 @@
 }
 
 .twoColLayout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    align-items: stretch;
+}
+
+/* Base Grid definitions */
+.timedGrid {
+    display: grid !important;
+    grid-template-columns: 60px minmax(150px, 2fr) 140px 100px 308px 80px minmax(60px, 1fr);
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    min-width: fit-content;
+}
+
+.flexGrid {
+    display: grid !important;
+    grid-template-columns: 60px minmax(150px, 2fr) 100px 308px 80px minmax(60px, 1fr);
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    min-width: fit-content;
+}
+
+.tableHeader {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-height: 60px;
+}
+
+.habitRow {
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+    min-height: 80px;
 }
 
 .habitColumn {
@@ -56,15 +90,19 @@
 }
 
 .flexTitleCol {
-    flex: 2;
-    min-width: 120px;
+    padding-left: 16px;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+    display: flex;
+    align-items: center;
 }
 
 .flexTitleColMain {
-    flex: 2;
-    min-width: 120px;
+    padding-left: 16px;
+    padding-right: 16px;
     display: flex;
     align-items: center;
+    border-right: 1px solid rgba(0, 0, 0, 0.07);
+    overflow: hidden;
 }
 
 .flexSubmitBtn {
@@ -353,7 +391,7 @@
 .habitsContainer {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-x: auto;
 }
 
 .tableHeader {
@@ -369,37 +407,35 @@
 }
 
 .habitSNoCol {
-    width: 60px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-right: 1px solid rgba(0, 0, 0, 0.07);
-    padding-right: 8px;
 }
 
 .habitTitleCol {
-    flex: 2;
-    min-width: 150px;
+    padding-left: 16px;
     border-right: 1px solid rgba(0, 0, 0, 0.07);
-    padding-right: 8px;
+    display: flex;
+    align-items: center;
 }
 
 .habitTimeCol {
-    width: 140px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-right: 1px solid rgba(0, 0, 0, 0.07);
-    padding-right: 8px;
 }
 
 .habitCompleteCol {
-    width: 100px;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     border-right: 1px solid rgba(0, 0, 0, 0.07);
-    padding-right: 8px;
 }
 
 .daysCol {
-    width: 308px;
-    flex-shrink: 0;
-    flex-grow: 0;
     display: grid;
     grid-template-columns: repeat(7, 44px);
     gap: 0px;
@@ -407,15 +443,17 @@
 }
 
 .habitActionCol {
-    width: 80px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-right: 1px solid rgba(0, 0, 0, 0.07);
 }
 
 .streakCol {
-    flex: 1;
-    text-align: right;
-    min-width: 80px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 8px;
 }
 
 .dayHead {
@@ -472,7 +510,6 @@
 }
 
 .habitSNoColMain {
-    width: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -485,12 +522,12 @@
 }
 
 .habitTitleColMain {
-    flex: 2;
-    min-width: 150px;
+    padding-left: 16px;
     padding-right: 16px;
     display: flex;
     align-items: center;
     border-right: 1px solid rgba(0, 0, 0, 0.07);
+    overflow: hidden;
 }
 
 .habitName {
@@ -500,7 +537,6 @@
 }
 
 .habitTimeColMain {
-    width: 140px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -514,7 +550,6 @@
 }
 
 .habitCompleteColMain {
-    width: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -578,9 +613,6 @@
 }
 
 .daysColMain {
-    width: 308px;
-    flex-shrink: 0;
-    flex-grow: 0;
     display: grid;
     grid-template-columns: repeat(7, 44px);
     gap: 0px;
@@ -589,7 +621,6 @@
 }
 
 .habitActionColMain {
-    width: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -598,10 +629,10 @@
 }
 
 .streakColMain {
-    flex: 1;
     display: flex;
     justify-content: flex-end;
-    min-width: 80px;
+    align-items: center;
+    padding-right: 8px;
 }
 
 .dayCheckbox {

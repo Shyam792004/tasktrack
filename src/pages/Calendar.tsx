@@ -8,12 +8,13 @@ interface CalendarEvent {
     title: string;
     date: Date;
     type: 'task' | 'goal' | 'reminder';
+    completed: boolean;
 }
 
 const mockEvents: CalendarEvent[] = [
-    { id: '1', title: 'Design Review', date: new Date(), type: 'task' },
-    { id: '2', title: 'Launch MVP', date: addDays(new Date(), 3), type: 'goal' },
-    { id: '3', title: 'Pay Bills', date: addDays(new Date(), -2), type: 'reminder' },
+    { id: '1', title: 'Design Review', date: new Date(), type: 'task', completed: false },
+    { id: '2', title: 'Launch MVP', date: addDays(new Date(), 3), type: 'goal', completed: false },
+    { id: '3', title: 'Pay Bills', date: addDays(new Date(), -2), type: 'reminder', completed: false },
 ];
 
 export function Calendar() {
@@ -31,6 +32,7 @@ export function Calendar() {
 
     useEffect(() => {
         localStorage.setItem('tracktrack_calendar_events', JSON.stringify(manualEvents));
+        window.dispatchEvent(new Event('tasksUpdate'));
     }, [manualEvents]);
 
     useEffect(() => {
@@ -50,7 +52,8 @@ export function Calendar() {
                 id: t.id,
                 title: t.title,
                 date: new Date(t.dueDate),
-                type: 'task'
+                type: 'task',
+                completed: t.completed || false
             });
         }
     });
@@ -61,7 +64,8 @@ export function Calendar() {
                 id: g.id,
                 title: g.title,
                 date: new Date(g.deadline),
-                type: 'goal'
+                type: 'goal',
+                completed: g.completed || false
             });
         }
     });
@@ -87,7 +91,8 @@ export function Calendar() {
             id: Date.now().toString(),
             title: newEventTitle,
             date: eventDate,
-            type: newEventType
+            type: newEventType,
+            completed: false
         };
 
         setManualEvents([...manualEvents, newEvent]);
@@ -160,7 +165,7 @@ export function Calendar() {
                         <span className={styles.dateNumber}>{formattedDate}</span>
                         <div className={styles.eventsList}>
                             {dayEvents.map(event => (
-                                <div key={event.id} className={`${styles.eventBadge} ${styles[event.type]}`}>
+                                <div key={event.id} className={`${styles.eventBadge} ${styles[event.type]} ${event.completed ? styles.completedEvent : ''}`}>
                                     {event.title}
                                 </div>
                             ))}
