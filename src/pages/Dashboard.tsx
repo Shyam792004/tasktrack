@@ -1,38 +1,44 @@
 import { useState, useEffect } from 'react';
 import { CheckSquare, TrendingUp, Flame, Zap, Award, ArrowUpRight, PlusCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import { subscribeToTasks, subscribeToSavings, subscribeToHabits, subscribeToFlexHabits, subscribeToTransactions } from '../services/dataService';
 import styles from './Dashboard.module.css';
 
 export function Dashboard() {
     const [tasks, setTasks] = useState<any[]>([]);
     const [savings, setSavings] = useState<any[]>([]);
-    const [habits, setHabits] = useState<any[]>([]);
+    const [timedHabits, setTimedHabits] = useState<any[]>([]);
+    const [flexHabits, setFlexHabits] = useState<any[]>([]);
     const [transactions, setTransactions] = useState<any[]>([]);
     const [insightIndex, setInsightIndex] = useState(0);
 
+    const [habits, setHabits] = useState<any[]>([]);
+
     useEffect(() => {
-        const t = localStorage.getItem('tracktrack_tasks');
-        const s = localStorage.getItem('tracktrack_savings');
-        const h = localStorage.getItem('tracktrack_habits');
-        const fh = localStorage.getItem('tracktrack_flex_habits');
-        const trans = localStorage.getItem('tracktrack_transactions');
-
-        if (t) setTasks(JSON.parse(t));
-        if (s) setSavings(JSON.parse(s));
-
-        const combinedHabits = [];
-        if (h) combinedHabits.push(...JSON.parse(h));
-        if (fh) combinedHabits.push(...JSON.parse(fh));
-        setHabits(combinedHabits);
-
-        if (trans) setTransactions(JSON.parse(trans));
+        const unsubTasks = subscribeToTasks(setTasks);
+        const unsubSavings = subscribeToSavings(setSavings);
+        const unsubHabits = subscribeToHabits(setTimedHabits);
+        const unsubFlexHabits = subscribeToFlexHabits(setFlexHabits);
+        const unsubTrans = subscribeToTransactions(setTransactions);
 
         // Insights timer
         const interval = setInterval(() => {
             setInsightIndex(prev => (prev + 1) % 3);
         }, 5000);
-        return () => clearInterval(interval);
+
+        return () => {
+            unsubTasks();
+            unsubSavings();
+            unsubHabits();
+            unsubFlexHabits();
+            unsubTrans();
+            clearInterval(interval);
+        };
     }, []);
+
+    useEffect(() => {
+        setHabits([...timedHabits, ...flexHabits]);
+    }, [timedHabits, flexHabits]);
 
     const todayStr = format(new Date(), 'yyyy-MM-dd');
 

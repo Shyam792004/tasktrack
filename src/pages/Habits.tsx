@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Flame, Check, X, Clock, Edit2, Trash2 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
+import { subscribeToHabits, subscribeToFlexHabits, addHabit, updateHabit, deleteHabit, addFlexHabit, updateFlexHabit, deleteFlexHabit } from '../services/dataService';
 import styles from './Habits.module.css';
 
 // ── Circle SVG Progress ──
@@ -133,37 +134,19 @@ interface FlexibleHabit {
 const todayStr = format(new Date(), 'yyyy-MM-dd');
 const yesterdayStr = format(subDays(new Date(), 1), 'yyyy-MM-dd');
 
-const initialHabits: Habit[] = [
-    { id: '1', title: 'Drink 2L Water', startTime: '08:00', endTime: '20:00', streak: 5, completedDays: [yesterdayStr, todayStr] },
-    { id: '2', title: 'Read 30 pages', startTime: '20:00', endTime: '21:00', streak: 12, completedDays: [yesterdayStr] },
-    { id: '3', title: 'Morning Workout', startTime: '06:30', endTime: '07:30', streak: 0, completedDays: [] },
-];
-
-const initialFlexibleHabits: FlexibleHabit[] = [
-    { id: 'f1', title: 'Drink 3L of Water', streak: 3, completedDays: [yesterdayStr, todayStr] },
-    { id: 'f2', title: 'Visit Temple', streak: 7, completedDays: [yesterdayStr] },
-    { id: 'f3', title: 'Evening Walk', streak: 0, completedDays: [] },
-];
-
 export function Habits() {
     // --- State Persistence & Initialization ---
-    const [habits, setHabits] = useState<Habit[]>(() => {
-        const saved = localStorage.getItem('tracktrack_habits');
-        return saved ? JSON.parse(saved) : initialHabits;
-    });
-
-    const [flexibleHabits, setFlexibleHabits] = useState<FlexibleHabit[]>(() => {
-        const saved = localStorage.getItem('tracktrack_flex_habits');
-        return saved ? JSON.parse(saved) : initialFlexibleHabits;
-    });
+    const [habits, setHabits] = useState<Habit[]>([]);
+    const [flexibleHabits, setFlexibleHabits] = useState<FlexibleHabit[]>([]);
 
     useEffect(() => {
-        localStorage.setItem('tracktrack_habits', JSON.stringify(habits));
-    }, [habits]);
-
-    useEffect(() => {
-        localStorage.setItem('tracktrack_flex_habits', JSON.stringify(flexibleHabits));
-    }, [flexibleHabits]);
+        const unsubHabits = subscribeToHabits(setHabits);
+        const unsubFlex = subscribeToFlexHabits(setFlexibleHabits);
+        return () => {
+            unsubHabits();
+            unsubFlex();
+        };
+    }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingHabitId, setEditingHabitId] = useState<string | null>(null);
@@ -220,29 +203,30 @@ export function Habits() {
         setIsModalOpen(true);
     };
 
-    const handleAddHabit = (e: React.FormEvent) => {
+    const handleAddHabit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newHabitName.trim()) return;
-        let updatedHabits = [...habits];
-        if (editingHabitId) {
-            updatedHabits = updatedHabits.map(h =>
-                h.id === editingHabitId
-                    ? { ...h, title: newHabitName, startTime: newHabitStartTime || '00:00', endTime: newHabitEndTime || '23:59' }
-                    : h
-            );
-        } else {
-            updatedHabits.push({
-                id: Date.now().toString(),
-                title: newHabitName,
-                startTime: newHabitStartTime || '00:00',
-                endTime: newHabitEndTime || '23:59',
-                streak: 0,
-                completedDays: [],
-            });
+        
+        try {
+            if (editingHabitId) {
+                await updateHabit(editingHabitId, {
+                    title: newHabitName,
+                    startTime: newHabitStartTime || '00:00',
+                    endTime: newHabitEndTime || '23:59'
+                });
+            } else {
+                await addHabit({
+                    title: newHabitName,
+                    startTime: newHabitStartTime || '00:00',
+                    endTime: newHabitEndTime || '23:59',
+                    streak: 0,
+                    completedDays: [],
+                });
+            }
+            closeModal();
+        } catch (err) {
+            console.error(err);
         }
-        updatedHabits.sort((a, b) => a.startTime.localeCompare(b.startTime));
-        setHabits(updatedHabits);
-        closeModal();
     };
 
     const closeModal = () => {
@@ -253,24 +237,28 @@ export function Habits() {
         setNewHabitEndTime('');
     };
 
-    const toggleHabitDay = (habitId: string, dateStr: string) => {
-        setHabits(habits.map(h => {
-            if (h.id === habitId) {
-                const hasCompleted = h.completedDays.includes(dateStr);
-                const newCompletedDays = hasCompleted
-                    ? h.completedDays.filter(d => d !== dateStr)
-                    : [...h.completedDays, dateStr];
-                let newStreak = h.streak;
-                if (dateStr === todayStr) {
-                    newStreak = hasCompleted ? Math.max(0, newStreak - 1) : newStreak + 1;
-                }
-                return { ...h, completedDays: newCompletedDays, streak: newStreak };
-            }
-            return h;
-        }));
+    const toggleHabitDay = async (habitId: string, dateStr: string) => {
+        const habit = habits.find(h => h.id === habitId);
+        if (!habit) return;
+
+        const hasCompleted = habit.completedDays.includes(dateStr);
+        const newCompletedDays = hasCompleted
+            ? habit.completedDays.filter(d => d !== dateStr)
+            : [...habit.completedDays, dateStr];
+        
+        let newStreak = habit.streak;
+        if (dateStr === todayStr) {
+            newStreak = hasCompleted ? Math.max(0, newStreak - 1) : newStreak + 1;
+        }
+
+        await updateHabit(habitId, { completedDays: newCompletedDays, streak: newStreak });
     };
 
-    const deleteHabit = (id: string) => setHabits(habits.filter(h => h.id !== id));
+    const handleDeleteHabit = async (id: string) => {
+        if (confirm('Delete this habit?')) {
+            await deleteHabit(id);
+        }
+    };
 
     const sortedHabits = [...habits].sort((a, b) => a.startTime.localeCompare(b.startTime));
 
@@ -281,22 +269,24 @@ export function Habits() {
         setIsFlexModalOpen(true);
     };
 
-    const handleAddFlexHabit = (e: React.FormEvent) => {
+    const handleAddFlexHabit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newFlexName.trim()) return;
-        if (editingFlexId) {
-            setFlexibleHabits(flexibleHabits.map(h =>
-                h.id === editingFlexId ? { ...h, title: newFlexName } : h
-            ));
-        } else {
-            setFlexibleHabits([...flexibleHabits, {
-                id: `f${Date.now()}`,
-                title: newFlexName,
-                streak: 0,
-                completedDays: [],
-            }]);
+
+        try {
+            if (editingFlexId) {
+                await updateFlexHabit(editingFlexId, { title: newFlexName });
+            } else {
+                await addFlexHabit({
+                    title: newFlexName,
+                    streak: 0,
+                    completedDays: [],
+                });
+            }
+            closeFlexModal();
+        } catch (err) {
+            console.error(err);
         }
-        closeFlexModal();
     };
 
     const closeFlexModal = () => {
@@ -305,24 +295,28 @@ export function Habits() {
         setNewFlexName('');
     };
 
-    const toggleFlexDay = (habitId: string, dateStr: string) => {
-        setFlexibleHabits(flexibleHabits.map(h => {
-            if (h.id === habitId) {
-                const hasCompleted = h.completedDays.includes(dateStr);
-                const newCompletedDays = hasCompleted
-                    ? h.completedDays.filter(d => d !== dateStr)
-                    : [...h.completedDays, dateStr];
-                let newStreak = h.streak;
-                if (dateStr === todayStr) {
-                    newStreak = hasCompleted ? Math.max(0, newStreak - 1) : newStreak + 1;
-                }
-                return { ...h, completedDays: newCompletedDays, streak: newStreak };
-            }
-            return h;
-        }));
+    const toggleFlexDay = async (habitId: string, dateStr: string) => {
+        const habit = flexibleHabits.find(h => h.id === habitId);
+        if (!habit) return;
+
+        const hasCompleted = habit.completedDays.includes(dateStr);
+        const newCompletedDays = hasCompleted
+            ? habit.completedDays.filter(d => d !== dateStr)
+            : [...habit.completedDays, dateStr];
+
+        let newStreak = habit.streak;
+        if (dateStr === todayStr) {
+            newStreak = hasCompleted ? Math.max(0, newStreak - 1) : newStreak + 1;
+        }
+
+        await updateFlexHabit(habitId, { completedDays: newCompletedDays, streak: newStreak });
     };
 
-    const deleteFlexHabit = (id: string) => setFlexibleHabits(flexibleHabits.filter(h => h.id !== id));
+    const handleDeleteFlexHabit = async (id: string) => {
+        if (confirm('Delete this flexible habit?')) {
+            await deleteFlexHabit(id);
+        }
+    };
 
     // Helper: renders a row of 7 circular day-progress indicators
     const renderDayProgressRow = (
@@ -456,7 +450,7 @@ export function Habits() {
                                     </div>
                                     <div className={styles.habitActionColMain}>
                                         <button className={styles.editBtn} onClick={() => openEditModal(habit)}><Edit2 size={14} /></button>
-                                        <button className={styles.deleteBtn} onClick={() => deleteHabit(habit.id)}><Trash2 size={14} /></button>
+                                        <button className={styles.deleteBtn} onClick={() => handleDeleteHabit(habit.id)}><Trash2 size={14} /></button>
                                     </div>
                                     <div className={styles.streakColMain}>
                                         <div
@@ -542,7 +536,7 @@ export function Habits() {
                                     </div>
                                     <div className={styles.habitActionColMain}>
                                         <button className={styles.editBtn} onClick={() => openEditFlexModal(habit)}><Edit2 size={14} /></button>
-                                        <button className={styles.deleteBtn} onClick={() => deleteFlexHabit(habit.id)}><Trash2 size={14} /></button>
+                                        <button className={styles.deleteBtn} onClick={() => handleDeleteFlexHabit(habit.id)}><Trash2 size={14} /></button>
                                     </div>
                                     <div className={styles.streakColMain}>
                                         <div

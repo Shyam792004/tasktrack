@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Droplets, Utensils, Moon, Scale, Plus, Trash2, ChevronDown, ChevronUp, Flame, Settings, Edit, Save, Footprints } from 'lucide-react';
 import { format } from 'date-fns';
+import { subscribeToHealthByDate, updateHealthData, subscribeToFoodDatabase, updateFoodDatabase } from '../services/dataService';
 import styles from './Health.module.css';
 
 // ── Types ──────────────────────────────────────────────
@@ -69,10 +70,6 @@ const initialMeals: Meal[] = [
     { id: 'snacks', label: 'Snacks', icon: '🍎', entries: [] },
 ];
 
-const initialSleep: SleepLog[] = [
-    { id: 's1', date: format(new Date(), 'yyyy-MM-dd'), hours: 7, quality: 'good' },
-];
-
 const QUALITY_COLORS = { poor: '#ef4444', fair: '#f59e0b', good: '#10b981', great: '#3b82f6' };
 
 // ── BMI Helper ──────────────────────────────────────────
@@ -114,68 +111,32 @@ export function Health() {
     const today = format(new Date(), 'yyyy-MM-dd');
 
     // --- State Persistence & Initialization ---
-    const [foodDatabase, setFoodDatabase] = useState<FoodItem[]>(() => {
-        const saved = localStorage.getItem('tracktrack_food_db');
-        return saved ? JSON.parse(saved) : DEFAULT_FOODS;
-    });
+    const [foodDatabase, setFoodDatabase] = useState<FoodItem[]>(DEFAULT_FOODS);
+    const [steps, setSteps] = useState<number>(0);
+    const [meals, setMeals] = useState<Meal[]>(initialMeals);
+    const [waterGlasses, setWaterGlasses] = useState(0);
+    const [waterGoal, setWaterGoal] = useState(8);
+    const [weight, setWeight] = useState('');
+    const [height, setHeight] = useState('');
+    const [sleepLogs, setSleepLogs] = useState<SleepLog[]>([]);
 
     useEffect(() => {
-        localStorage.setItem('tracktrack_food_db', JSON.stringify(foodDatabase));
-    }, [foodDatabase]);
+        const unsubFood = subscribeToFoodDatabase(setFoodDatabase);
+        const unsubHealth = subscribeToHealthByDate(today, (data) => {
+            if (data.steps !== undefined) setSteps(data.steps);
+            if (data.meals) setMeals(data.meals);
+            if (data.waterGlasses !== undefined) setWaterGlasses(data.waterGlasses);
+            if (data.waterGoal !== undefined) setWaterGoal(data.waterGoal);
+            if (data.weight !== undefined) setWeight(data.weight);
+            if (data.height !== undefined) setHeight(data.height);
+            if (data.sleepLogs) setSleepLogs(data.sleepLogs);
+        });
+        return () => {
+            unsubFood();
+            unsubHealth();
+        };
+    }, [today]);
 
-    // Steps state
-    const [steps, setSteps] = useState<number>(() => {
-        const saved = localStorage.getItem('tracktrack_steps');
-        return saved ? Number(saved) : 0;
-    });
-
-    useEffect(() => {
-        localStorage.setItem('tracktrack_steps', steps.toString());
-    }, [steps]);
-
-    // Meals
-    const [meals, setMeals] = useState<Meal[]>(() => {
-        const saved = localStorage.getItem('tracktrack_meals');
-        return saved ? JSON.parse(saved) : initialMeals;
-    });
-
-    useEffect(() => {
-        localStorage.setItem('tracktrack_meals', JSON.stringify(meals));
-    }, [meals]);
-
-    // Water
-    const [waterGlasses, setWaterGlasses] = useState(() => {
-        const saved = localStorage.getItem('tracktrack_water_current');
-        return saved ? Number(saved) : 0;
-    });
-    const [waterGoal, setWaterGoal] = useState(() => {
-        const saved = localStorage.getItem('tracktrack_water_goal');
-        return saved ? Number(saved) : 8;
-    });
-
-    useEffect(() => {
-        localStorage.setItem('tracktrack_water_current', waterGlasses.toString());
-        localStorage.setItem('tracktrack_water_goal', waterGoal.toString());
-    }, [waterGlasses, waterGoal]);
-
-    // BMI / Stats
-    const [weight, setWeight] = useState(() => localStorage.getItem('tracktrack_weight') || '');
-    const [height, setHeight] = useState(() => localStorage.getItem('tracktrack_height') || '');
-
-    useEffect(() => {
-        localStorage.setItem('tracktrack_weight', weight);
-        localStorage.setItem('tracktrack_height', height);
-    }, [weight, height]);
-
-    // Sleep
-    const [sleepLogs, setSleepLogs] = useState<SleepLog[]>(() => {
-        const saved = localStorage.getItem('tracktrack_sleep');
-        return saved ? JSON.parse(saved) : initialSleep;
-    });
-
-    useEffect(() => {
-        localStorage.setItem('tracktrack_sleep', JSON.stringify(sleepLogs));
-    }, [sleepLogs]);
     const [expandedMeal, setExpandedMeal] = useState<string | null>('breakfast');
     const [addingTo, setAddingTo] = useState<string | null>(null);
 
@@ -188,7 +149,7 @@ export function Health() {
     const [editingFoodId, setEditingFoodId] = useState<string | null>(null);
     const [foodInProgress, setFoodInProgress] = useState<Partial<FoodItem>>({});
 
-    const addStaticEntry = (mealId: string) => {
+    const addStaticEntry = async (mealId: string) => {
         const food = foodDatabase.find(f => f.id === selectedFoodId);
         if (!food) return;
 
@@ -200,7 +161,8 @@ export function Health() {
             carbs: Math.round(food.carbs * foodQuantity),
             fat: Math.round(food.fat * foodQuantity),
         };
-        setMeals(meals.map(m => m.id === mealId ? { ...m, entries: [...m.entries, entry] } : m));
+        const updatedMeals = meals.map(m => m.id === mealId ? { ...m, entries: [...m.entries, entry] } : m);
+        await updateHealthData(today, { meals: updatedMeals });
         setAddingTo(null);
         setFoodQuantity(1);
     };
@@ -210,16 +172,18 @@ export function Health() {
         setFoodQuantity(1);
     };
 
-    const removeEntry = (mealId: string, entryId: string) => {
-        setMeals(meals.map(m => m.id === mealId ? { ...m, entries: m.entries.filter(e => e.id !== entryId) } : m));
+    const removeEntry = async (mealId: string, entryId: string) => {
+        const updatedMeals = meals.map(m => m.id === mealId ? { ...m, entries: m.entries.filter(e => e.id !== entryId) } : m);
+        await updateHealthData(today, { meals: updatedMeals });
     };
 
     // Library CRUD
-    const handleAddOrUpdateFood = () => {
+    const handleAddOrUpdateFood = async () => {
         if (!foodInProgress.name || foodInProgress.calories === undefined) return;
 
+        let updatedDb = [...foodDatabase];
         if (editingFoodId) {
-            setFoodDatabase(foodDatabase.map(f => f.id === editingFoodId ? { ...f, ...foodInProgress } as FoodItem : f));
+            updatedDb = updatedDb.map(f => f.id === editingFoodId ? { ...f, ...foodInProgress } as FoodItem : f);
         } else {
             const newItem: FoodItem = {
                 id: 'f' + Date.now().toString(),
@@ -230,8 +194,9 @@ export function Health() {
                 carbs: Number(foodInProgress.carbs) || 0,
                 fat: Number(foodInProgress.fat) || 0,
             };
-            setFoodDatabase([...foodDatabase, newItem]);
+            updatedDb.push(newItem);
         }
+        await updateFoodDatabase(updatedDb);
         setEditingFoodId(null);
         setFoodInProgress({});
     };
@@ -241,10 +206,12 @@ export function Health() {
         setFoodInProgress(food);
     };
 
-    const deleteFood = (id: string) => {
-        setFoodDatabase(foodDatabase.filter(f => f.id !== id));
-        if (selectedFoodId === id && foodDatabase.length > 1) {
-            setSelectedFoodId(foodDatabase.find(f => f.id !== id)?.id || '');
+    const deleteFood = async (id: string) => {
+        if (!confirm('Delete this food from library?')) return;
+        const updatedDb = foodDatabase.filter(f => f.id !== id);
+        await updateFoodDatabase(updatedDb);
+        if (selectedFoodId === id && updatedDb.length > 1) {
+            setSelectedFoodId(updatedDb[0].id);
         }
     };
 
@@ -254,9 +221,10 @@ export function Health() {
     const [sleepHours, setSleepHours] = useState('');
     const [sleepQuality, setSleepQuality] = useState<SleepLog['quality']>('good');
 
-    const logSleep = () => {
+    const logSleep = async () => {
         if (!sleepHours) return;
-        setSleepLogs([{ id: Date.now().toString(), date: today, hours: Number(sleepHours), quality: sleepQuality }, ...sleepLogs]);
+        const updatedLogs = [{ id: Date.now().toString(), date: today, hours: Number(sleepHours), quality: sleepQuality }, ...sleepLogs];
+        await updateHealthData(today, { sleepLogs: updatedLogs });
         setSleepHours('');
     };
 
@@ -319,10 +287,10 @@ export function Health() {
                             <div className={styles.waterGoalInput}>
                                 <label>Daily goal</label>
                                 <input type="number" min="1" max="20" value={waterGoal}
-                                    onChange={e => {
+                                    onChange={async (e) => {
                                         const v = Math.max(1, Number(e.target.value));
-                                        setWaterGoal(v);
-                                        if (waterGlasses > v) setWaterGlasses(v);
+                                        await updateHealthData(today, { waterGoal: v });
+                                        if (waterGlasses > v) await updateHealthData(today, { waterGlasses: v });
                                     }}
                                     className={styles.waterGoalNum}
                                 />
@@ -334,7 +302,7 @@ export function Health() {
                             {Array.from({ length: waterGoal }).map((_, i) => (
                                 <button key={i}
                                     className={`${styles.glass} ${i < waterGlasses ? styles.glassFilled : ''}`}
-                                    onClick={() => setWaterGlasses(i < waterGlasses ? i : i + 1)}
+                                    onClick={() => updateHealthData(today, { waterGlasses: i < waterGlasses ? i : i + 1 })}
                                     title={`${i + 1} glass${i > 0 ? 'es' : ''}`}
                                 >💧</button>
                             ))}
@@ -343,8 +311,8 @@ export function Health() {
                             <div className={styles.waterFill} style={{ width: `${(waterGlasses / waterGoal) * 100}%` }} />
                         </div>
                         <div className={styles.waterBtns}>
-                            <button className={styles.waterBtn} onClick={() => setWaterGlasses(Math.max(0, waterGlasses - 1))}>− Remove</button>
-                            <button className={`${styles.waterBtn} ${styles.waterBtnAdd}`} onClick={() => setWaterGlasses(Math.min(waterGoal, waterGlasses + 1))}>+ Add Glass</button>
+                            <button className={styles.waterBtn} onClick={() => updateHealthData(today, { waterGlasses: Math.max(0, waterGlasses - 1) })}>− Remove</button>
+                            <button className={`${styles.waterBtn} ${styles.waterBtnAdd}`} onClick={() => updateHealthData(today, { waterGlasses: Math.min(waterGoal, waterGlasses + 1) })}>+ Add Glass</button>
                         </div>
                     </div>
 
@@ -352,15 +320,15 @@ export function Health() {
                     <div className={`glass-panel ${styles.card}`}>
                         <h3 className={styles.sectionTitle}><Scale size={18} color="#8b5cf6" /> BMI Calculator</h3>
                         <div className={styles.bmiInputs}>
-                            <div className={styles.bmiField}>
+                             <div className={styles.bmiField}>
                                 <label>Weight (kg)</label>
                                 <input type="number" placeholder="e.g. 70" value={weight}
-                                    onChange={e => setWeight(e.target.value)} className={styles.bmiInput} />
+                                    onChange={e => updateHealthData(today, { weight: e.target.value })} className={styles.bmiInput} />
                             </div>
                             <div className={styles.bmiField}>
                                 <label>Height (cm)</label>
                                 <input type="number" placeholder="e.g. 175" value={height}
-                                    onChange={e => setHeight(e.target.value)} className={styles.bmiInput} />
+                                    onChange={e => updateHealthData(today, { height: e.target.value })} className={styles.bmiInput} />
                             </div>
                         </div>
                         {bmi.value > 0 && (
@@ -432,7 +400,7 @@ export function Health() {
                                     type="number"
                                     placeholder="e.g. 8000"
                                     value={steps || ''}
-                                    onChange={e => setSteps(Number(e.target.value))}
+                                    onChange={async e => await updateHealthData(today, { steps: Number(e.target.value) })}
                                     className={styles.bmiInput}
                                 />
                             </div>

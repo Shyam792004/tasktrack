@@ -403,3 +403,154 @@
     background-color: var(--accent-primary);
     opacity: 0.9;
 }
+
+.selectedCell {
+    background-color: rgba(59, 130, 246, 0.12) !important;
+    border: 2px solid var(--accent-primary) !important;
+    z-index: 1;
+}
+
+.moreEvents {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Day Detail View */
+.dayDetailView {
+    margin-top: 24px;
+    padding: 24px;
+    animation: slideUp 0.3s ease-out;
+}
+
+.dayDetailHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+}
+
+.dayDetailHeader h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.addDayBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.addDayBtn:hover {
+    background-color: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+}
+
+.dayEventsList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dayEventItem {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    transition: transform 0.2s;
+}
+
+.dayEventItem:hover {
+    transform: translateX(4px);
+}
+
+.typeDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.taskDot { background-color: #3b82f6; }
+.goalDot { background-color: #10b981; }
+.reminderDot { background-color: #f59e0b; }
+
+.detailInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.detailTitle {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.detailType {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.deleteEventBtn {
+    color: var(--text-secondary);
+    opacity: 0.5;
+    transition: all 0.2s;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.deleteEventBtn:hover {
+    color: var(--accent-danger);
+    opacity: 1;
+}
+
+.emptyDay {
+    text-align: center;
+    padding: 32px;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .calendarRow {
+        min-height: 80px;
+    }
+    
+    .cell {
+        min-height: 80px;
+        padding: 6px;
+    }
+    
+    .eventBadge {
+        display: none; /* Hide badges on very small screens, use Day View instead */
+    }
+
+    .moreEvents {
+        display: block;
+        margin-top: 4px;
+    }
+
+    .dayName {
+        padding: 10px 4px;
+        font-size: 0.75rem;
+    }
+}

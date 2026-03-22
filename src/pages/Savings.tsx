@@ -12,6 +12,7 @@ import {
     Award,
     X
 } from 'lucide-react';
+import { subscribeToSavings, addSavingsGoal, updateSavingsGoal, deleteSavingsGoal } from '../services/dataService';
 import styles from './Savings.module.css';
 
 interface SavingsGoal {
@@ -22,7 +23,6 @@ interface SavingsGoal {
     icon: string;
     color: string;
     type: 'long-term' | 'short-term';
-    createdAt: string;
 }
 
 const ICON_MAP: Record<string, any> = {
@@ -35,10 +35,7 @@ const ICON_MAP: Record<string, any> = {
 const COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4'];
 
 export function Savings() {
-    const [goals, setGoals] = useState<SavingsGoal[]>(() => {
-        const saved = localStorage.getItem('tracktrack_savings');
-        return saved ? JSON.parse(saved) : [];
-    });
+    const [goals, setGoals] = useState<SavingsGoal[]>([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
@@ -52,74 +49,91 @@ export function Savings() {
     const [manualAmount, setManualAmount] = useState('');
 
     useEffect(() => {
-        localStorage.setItem('tracktrack_savings', JSON.stringify(goals));
-    }, [goals]);
+        return subscribeToSavings(setGoals);
+    }, []);
 
-    const handleAddGoal = (e: React.FormEvent) => {
+    const handleAddGoal = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!goalForm.title || !goalForm.target) return;
 
-        const goal: SavingsGoal = {
-            id: Date.now().toString(),
-            title: goalForm.title,
-            targetAmount: Number(goalForm.target),
-            currentAmount: 0,
-            icon: goalForm.icon,
-            color: goalForm.color,
-            type: goalForm.type,
-            createdAt: new Date().toISOString()
-        };
-
-        setGoals([...goals, goal]);
-        setIsAddModalOpen(false);
-        setGoalForm({ title: '', target: '', icon: 'Home', color: COLORS[0], type: 'short-term' });
+        try {
+            await addSavingsGoal({
+                title: goalForm.title,
+                targetAmount: Number(goalForm.target),
+                currentAmount: 0,
+                icon: goalForm.icon,
+                color: goalForm.color,
+                type: goalForm.type,
+            });
+            setIsAddModalOpen(false);
+            setGoalForm({ title: '', target: '', icon: 'Home', color: COLORS[0], type: 'short-term' });
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    const handleEditGoal = (e: React.FormEvent) => {
+    const handleEditGoal = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedGoalId || !goalForm.title || !goalForm.target) return;
 
-        setGoals(goals.map(g =>
-            g.id === selectedGoalId
-                ? { ...g, title: goalForm.title, targetAmount: Number(goalForm.target), icon: goalForm.icon, color: goalForm.color, type: goalForm.type }
-                : g
-        ));
-        setIsEditModalOpen(false);
-        setGoalForm({ title: '', target: '', icon: 'Home', color: COLORS[0], type: 'short-term' });
-        setSelectedGoalId(null);
+        try {
+            await updateSavingsGoal(selectedGoalId, {
+                title: goalForm.title,
+                targetAmount: Number(goalForm.target),
+                icon: goalForm.icon,
+                color: goalForm.color,
+                type: goalForm.type
+            });
+            setIsEditModalOpen(false);
+            setGoalForm({ title: '', target: '', icon: 'Home', color: COLORS[0], type: 'short-term' });
+            setSelectedGoalId(null);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    const handleTopUp = (e: React.FormEvent) => {
+    const handleTopUp = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedGoalId || !topUpAmount) return;
 
-        setGoals(goals.map(g =>
-            g.id === selectedGoalId
-                ? { ...g, currentAmount: g.currentAmount + Number(topUpAmount) }
-                : g
-        ));
-        setIsTopUpModalOpen(false);
-        setTopUpAmount('');
-        setSelectedGoalId(null);
+        const goal = goals.find(g => g.id === selectedGoalId);
+        if (!goal) return;
+
+        try {
+            await updateSavingsGoal(selectedGoalId, {
+                currentAmount: goal.currentAmount + Number(topUpAmount)
+            });
+            setIsTopUpModalOpen(false);
+            setTopUpAmount('');
+            setSelectedGoalId(null);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    const handleAmountUpdate = (e: React.FormEvent) => {
+    const handleAmountUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedGoalId || manualAmount === '') return;
 
-        setGoals(goals.map(g =>
-            g.id === selectedGoalId
-                ? { ...g, currentAmount: Number(manualAmount) }
-                : g
-        ));
-        setIsAmountModalOpen(false);
-        setManualAmount('');
-        setSelectedGoalId(null);
+        try {
+            await updateSavingsGoal(selectedGoalId, {
+                currentAmount: Number(manualAmount)
+            });
+            setIsAmountModalOpen(false);
+            setManualAmount('');
+            setSelectedGoalId(null);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    const deleteGoal = (id: string) => {
+    const deleteGoal = async (id: string) => {
         if (window.confirm('Delete this savings goal?')) {
-            setGoals(goals.filter(g => g.id !== id));
+            try {
+                await deleteSavingsGoal(id);
+            } catch (err) {
+                console.error(err);
+            }
         }
     };
 

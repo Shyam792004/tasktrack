@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday } from 'date-fns';
-import { subscribeToCalendarEvents, addCalendarEvent } from '../services/dataService';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday, eachDayOfInterval } from 'date-fns';
+import { subscribeToCalendarEvents, addCalendarEvent, updateCalendarEvent, deleteCalendarEvent, subscribeToTasks, subscribeToGoals } from '../services/dataService';
 import styles from './Calendar.module.css';
 
 interface CalendarEvent {
@@ -12,12 +12,6 @@ interface CalendarEvent {
     completed: boolean;
 }
 
-const mockEvents: CalendarEvent[] = [
-    { id: '1', title: 'Design Review', date: new Date(), type: 'task', completed: false },
-    { id: '2', title: 'Launch MVP', date: addDays(new Date(), 3), type: 'goal', completed: false },
-    { id: '3', title: 'Pay Bills', date: addDays(new Date(), -2), type: 'reminder', completed: false },
-];
-
 export function Calendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [manualEvents, setManualEvents] = useState<CalendarEvent[]>([]);
@@ -25,6 +19,7 @@ export function Calendar() {
     const [tasks, setTasks] = useState<any[]>([]);
     const [goals, setGoals] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedDay, setSelectedDay] = useState<Date | null>(new Date());
 
     useEffect(() => {
         const unsubscribe = subscribeToCalendarEvents((fetchedEvents) => {
@@ -32,16 +27,18 @@ export function Calendar() {
                 ...e,
                 date: new Date(e.date)
             }));
-            setManualEvents(parsed.length > 0 ? parsed : mockEvents);
+            setManualEvents(parsed);
         });
         return () => unsubscribe();
     }, []);
 
     useEffect(() => {
-        const savedTasks = localStorage.getItem('tracktrack_tasks');
-        const savedGoals = localStorage.getItem('tracktrack_goals');
-        if (savedTasks) setTasks(JSON.parse(savedTasks));
-        if (savedGoals) setGoals(JSON.parse(savedGoals));
+        const unsubTasks = subscribeToTasks(setTasks);
+        const unsubGoals = subscribeToGoals(setGoals);
+        return () => {
+            unsubTasks();
+            unsubGoals();
+        };
     }, []);
 
     // Derived events: manual + tasks + goal tasks
@@ -107,6 +104,13 @@ export function Calendar() {
         }
     };
 
+    const handleDeleteEvent = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        if (confirm('Delete this event?')) {
+            await deleteCalendarEvent(id);
+        }
+    };
+
     const renderHeader = () => {
         return (
             <div className={styles.header}>
@@ -164,16 +168,18 @@ export function Calendar() {
                         className={`${styles.cell} ${!isSameMonth(day, monthStart)
                             ? styles.disabledCell
                             : isToday(day) ? styles.todayCell : ''
-                            }`}
+                            } ${selectedDay && isSameDay(day, selectedDay) ? styles.selectedCell : ''}`}
                         key={day.toString()}
+                        onClick={() => setSelectedDay(cloneDay)}
                     >
                         <span className={styles.dateNumber}>{formattedDate}</span>
                         <div className={styles.eventsList}>
-                            {dayEvents.map(event => (
+                            {dayEvents.slice(0, 2).map(event => (
                                 <div key={event.id} className={`${styles.eventBadge} ${styles[event.type]} ${event.completed ? styles.completedEvent : ''}`}>
                                     {event.title}
                                 </div>
                             ))}
+                            {dayEvents.length > 2 && <div className={styles.moreEvents}>+{dayEvents.length - 2} more</div>}
                         </div>
                     </div>
                 );
@@ -210,6 +216,39 @@ export function Calendar() {
                 {renderDays()}
                 {renderCells()}
             </div>
+
+            {selectedDay && (
+                <div className={`glass-panel ${styles.dayDetailView}`}>
+                    <div className={styles.dayDetailHeader}>
+                        <h3>{format(selectedDay, 'EEEE, MMMM do')}</h3>
+                        <button className={styles.addDayBtn} onClick={() => {
+                            setNewEventDate(format(selectedDay, 'yyyy-MM-dd'));
+                            setIsModalOpen(true);
+                        }}>
+                            <Plus size={16} /> Add for this day
+                        </button>
+                    </div>
+                    <div className={styles.dayEventsList}>
+                        {events.filter(e => isSameDay(e.date, selectedDay)).map(event => (
+                            <div key={event.id} className={styles.dayEventItem}>
+                                <div className={`${styles.typeDot} ${styles[event.type + 'Dot']}`} />
+                                <div className={styles.detailInfo}>
+                                    <span className={styles.detailTitle}>{event.title}</span>
+                                    <span className={styles.detailType}>{event.type}</span>
+                                </div>
+                                {event.id && !tasks.find(t => t.id === event.id) && !goals.find(g => g.id === event.id) && (
+                                    <button className={styles.deleteEventBtn} onClick={(e) => handleDeleteEvent(e, event.id)}>
+                                        <X size={16} />
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        {events.filter(e => isSameDay(e.date, selectedDay)).length === 0 && (
+                            <div className={styles.emptyDay}>No events scheduled for this day.</div>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {isModalOpen && (
                 <div className={styles.modalOverlay}>

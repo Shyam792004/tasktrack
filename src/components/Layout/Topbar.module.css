@@ -119,6 +119,33 @@
     object-fit: cover;
 }
 
+.syncIndicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    margin-right: 8px;
+}
+
+.syncText {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .syncText {
+        display: none;
+    }
+    .syncIndicator {
+        padding: 4px;
+        margin-right: 4px;
+    }
+}
+
 @media (max-width: 768px) {
     .menuButton {
         display: flex;

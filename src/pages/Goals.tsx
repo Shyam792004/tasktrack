@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { Target, CheckCircle2, Circle, Flag, Trash2, Plus, X, Edit2, Award } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
+import { subscribeToGoals, addGoal, updateGoal, deleteGoal } from '../services/dataService';
 import styles from './Goals.module.css';
 
 interface GoalTask {
@@ -18,43 +19,14 @@ interface Goal {
     tasks: GoalTask[];
 }
 
-const initialGoals: Goal[] = [
-    {
-        id: '1',
-        title: 'Launch MVP Beta',
-        description: 'Get the first version of the app to 100 beta testers.',
-        type: 'short-term',
-        targetDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-        tasks: [
-            { id: 't1', title: 'Complete Frontend', completed: true },
-            { id: 't2', title: 'Setup Database', completed: true },
-            { id: 't3', title: 'User Onboarding Flow', completed: false },
-        ]
-    },
-    {
-        id: '2',
-        title: 'Run a Half-Marathon',
-        description: 'Train to run 21k continuously.',
-        type: 'long-term',
-        targetDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-        tasks: [
-            { id: 't4', title: 'Buy running shoes', completed: true },
-            { id: 't5', title: 'Run 5k', completed: true },
-            { id: 't6', title: 'Run 10k', completed: false },
-            { id: 't7', title: 'Run 15k', completed: false },
-        ]
-    }
-];
 
 export function Goals() {
-    const [goals, setGoals] = useState<Goal[]>(() => {
-        const saved = localStorage.getItem('tracktrack_goals');
-        return saved ? JSON.parse(saved) : initialGoals;
-    });
+    const [goals, setGoals] = useState<Goal[]>([]);
 
     useEffect(() => {
-        localStorage.setItem('tracktrack_goals', JSON.stringify(goals));
-    }, [goals]);
+        const unsubscribe = subscribeToGoals(setGoals);
+        return () => unsubscribe();
+    }, []);
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,37 +69,33 @@ export function Goals() {
         setIsModalOpen(true);
     };
 
-    const handleAddGoal = (e: FormEvent) => {
+    const handleAddGoal = async (e: FormEvent) => {
         e.preventDefault();
         if (!newTitle || !newDescription || !newTargetDate) return;
 
         const filteredTasks = newTasks.filter(t => t.title.trim() !== '');
 
         if (editingGoalId) {
-            setGoals(goals.map(goal => {
-                if (goal.id === editingGoalId) {
+            const goalToUpdate = goals.find(g => g.id === editingGoalId);
+            if (!goalToUpdate) return;
+
+            const updatedGoalData = {
+                title: newTitle,
+                description: newDescription,
+                type: newType,
+                targetDate: new Date(newTargetDate).toISOString(),
+                tasks: filteredTasks.map((t, idx) => {
+                    const existing = goalToUpdate.tasks.find(existingTask => existingTask.id === t.id);
                     return {
-                        ...goal,
-                        title: newTitle,
-                        description: newDescription,
-                        type: newType,
-                        targetDate: new Date(newTargetDate).toISOString(),
-                        tasks: filteredTasks.map((t, idx) => {
-                            // preserve old task if it existed to keep completed status, else create new
-                            const existing = goal.tasks.find(existingTask => existingTask.id === t.id);
-                            return {
-                                id: existing ? existing.id : `new-t-${Date.now()}-${idx}`,
-                                title: t.title,
-                                completed: existing ? existing.completed : false
-                            };
-                        })
+                        id: existing ? existing.id : `new-t-${Date.now()}-${idx}`,
+                        title: t.title,
+                        completed: existing ? existing.completed : false
                     };
-                }
-                return goal;
-            }));
+                })
+            };
+            await updateGoal(editingGoalId, updatedGoalData);
         } else {
-            const newGoal: Goal = {
-                id: Date.now().toString(),
+            const newGoalData = {
                 title: newTitle,
                 description: newDescription,
                 type: newType,
@@ -138,7 +106,7 @@ export function Goals() {
                     completed: false
                 }))
             };
-            setGoals([...goals, newGoal]);
+            await addGoal(newGoalData);
         }
 
         closeModal();
@@ -154,20 +122,18 @@ export function Goals() {
         setNewTasks([{ title: '' }]);
     };
 
-    const toggleTask = (goalId: string, taskId: string) => {
-        setGoals(goals.map(goal => {
-            if (goal.id === goalId) {
-                return {
-                    ...goal,
-                    tasks: goal.tasks.map(t => t.id === taskId ? { ...t, completed: !t.completed } : t)
-                };
-            }
-            return goal;
-        }));
+    const toggleTask = async (goalId: string, taskId: string) => {
+        const goal = goals.find(g => g.id === goalId);
+        if (!goal) return;
+
+        const updatedTasks = goal.tasks.map(t => t.id === taskId ? { ...t, completed: !t.completed } : t);
+        await updateGoal(goalId, { tasks: updatedTasks });
     };
 
-    const deleteGoal = (goalId: string) => {
-        setGoals(goals.filter(g => g.id !== goalId));
+    const deleteGoalHandler = async (goalId: string) => {
+        if (confirm('Are you sure you want to delete this goal?')) {
+            await deleteGoal(goalId);
+        }
     };
 
     const longTermGoals = goals.filter(g => g.type === 'long-term');
@@ -196,7 +162,7 @@ export function Goals() {
                     </div>
                     <div className={styles.actionButtons}>
                         <button className={styles.editBtn} onClick={() => openEditModal(goal)}><Edit2 size={18} /></button>
-                        <button className={styles.deleteBtn} onClick={() => deleteGoal(goal.id)}><Trash2 size={18} /></button>
+                        <button className={styles.deleteBtn} onClick={() => deleteGoalHandler(goal.id)}><Trash2 size={18} /></button>
                     </div>
                 </div>
 

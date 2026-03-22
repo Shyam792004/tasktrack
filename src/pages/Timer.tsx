@@ -1,23 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Coffee, Briefcase, ListTodo } from 'lucide-react';
+import { subscribeToTasks, subscribeToUserSettings, updateUserSettings } from '../services/dataService';
 import styles from './Timer.module.css';
 
 export function Timer() {
     const [tasks, setTasks] = useState<any[]>([]);
-    const [focusDuration, setFocusDuration] = useState(() => {
-        const saved = localStorage.getItem('tracktrack_timer_duration');
-        return saved ? parseInt(saved) : 25;
-    });
-
-    const [sessions, setSessions] = useState(() => {
-        const saved = localStorage.getItem('tracktrack_timer_sessions');
-        return saved ? parseInt(saved) : 0;
-    });
-
-    const [totalFocusTime, setTotalFocusTime] = useState(() => {
-        const saved = localStorage.getItem('tracktrack_timer_total_time');
-        return saved ? parseInt(saved) : 0;
-    });
+    const [focusDuration, setFocusDuration] = useState(25);
+    const [sessions, setSessions] = useState(0);
+    const [totalFocusTime, setTotalFocusTime] = useState(0);
 
     const getBreakDuration = (fd: number) => fd === 25 ? 5 : 10;
 
@@ -27,25 +17,23 @@ export function Timer() {
     const [selectedTaskId, setSelectedTaskId] = useState<string>('');
 
     useEffect(() => {
-        const t = localStorage.getItem('tracktrack_tasks');
-        if (t) {
-            const parsed = JSON.parse(t);
-            setTasks(parsed);
-            if (parsed.length > 0) setSelectedTaskId(parsed[0].id);
-        }
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem('tracktrack_timer_duration', focusDuration.toString());
-    }, [focusDuration]);
-
-    useEffect(() => {
-        localStorage.setItem('tracktrack_timer_sessions', sessions.toString());
-    }, [sessions]);
-
-    useEffect(() => {
-        localStorage.setItem('tracktrack_timer_total_time', totalFocusTime.toString());
-    }, [totalFocusTime]);
+        const unsubTasks = subscribeToTasks((newTasks) => {
+            setTasks(newTasks);
+            if (newTasks.length > 0 && !selectedTaskId) setSelectedTaskId(newTasks[0].id);
+        });
+        const unsubSettings = subscribeToUserSettings((settings) => {
+            if (settings.timerDuration !== undefined) {
+                setFocusDuration(settings.timerDuration);
+                if (!isActive && mode === 'focus') setTimeLeft(settings.timerDuration * 60);
+            }
+            if (settings.timerSessions !== undefined) setSessions(settings.timerSessions);
+            if (settings.timerTotalFocusTime !== undefined) setTotalFocusTime(settings.timerTotalFocusTime);
+        });
+        return () => {
+            unsubTasks();
+            unsubSettings();
+        };
+    }, [selectedTaskId, isActive, mode]);
 
     useEffect(() => {
         let interval: number | null = null;
@@ -57,8 +45,12 @@ export function Timer() {
         } else if (timeLeft === 0) {
             setIsActive(false);
             if (mode === 'focus') {
-                setSessions(s => s + 1);
-                setTotalFocusTime(t => t + focusDuration);
+                const newSessions = sessions + 1;
+                const newTotalTime = totalFocusTime + focusDuration;
+                updateUserSettings({
+                    timerSessions: newSessions,
+                    timerTotalFocusTime: newTotalTime
+                });
             }
         }
 
@@ -80,9 +72,9 @@ export function Timer() {
         setTimeLeft(newMode === 'focus' ? focusDuration * 60 : getBreakDuration(focusDuration) * 60);
     };
 
-    const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleDurationChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         const val = parseInt(e.target.value);
-        setFocusDuration(val);
+        await updateUserSettings({ timerDuration: val });
         setIsActive(false);
         if (mode === 'focus') {
             setTimeLeft(val * 60);

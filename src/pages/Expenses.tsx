@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import { Plus, Coffee, Briefcase, ShoppingBag, Home, Zap, X } from 'lucide-react';
 import { format } from 'date-fns';
+import { subscribeToTransactions, addTransaction, deleteTransaction, subscribeToCategories, updateCategories } from '../services/dataService';
 import styles from './Expenses.module.css';
 
 interface Transaction {
@@ -36,59 +37,23 @@ const INITIAL_INCOME_CATEGORIES = [
     { id: 'Other', icon: 'Coffee', color: '#f59e0b' },
 ];
 
-const initialTransactions: Transaction[] = [
-    { id: '1', amount: 45.00, category: 'Food', title: 'Lunch at Cafe', date: new Date().toISOString(), type: 'expense' },
-    { id: '2', amount: 120.00, category: 'Bills', title: 'Internet Bill', date: new Date().toISOString(), type: 'expense' },
-    { id: '3', amount: 35.50, category: 'Travel', title: 'Uber ride', date: new Date().toISOString(), type: 'expense' },
-    { id: '4', amount: 4500.00, category: 'Salary', title: 'Monthly Salary', date: new Date().toISOString(), type: 'income' },
-];
-
 export function Expenses() {
-    const [expenseCategories, setExpenseCategories] = useState(() => {
-        const saved = localStorage.getItem('tracktrack_expense_cats');
-        if (!saved) return INITIAL_EXPENSE_CATEGORIES;
-        try {
-            const parsed = JSON.parse(saved);
-            // Check if any category has a raw object in icon (serialization error from before)
-            return parsed.map((cat: any) => ({
-                ...cat,
-                icon: typeof cat.icon === 'string' ? cat.icon : 'Zap'
-            }));
-        } catch {
-            return INITIAL_EXPENSE_CATEGORIES;
-        }
-    });
-
-    const [incomeCategories, setIncomeCategories] = useState(() => {
-        const saved = localStorage.getItem('tracktrack_income_cats');
-        if (!saved) return INITIAL_INCOME_CATEGORIES;
-        try {
-            const parsed = JSON.parse(saved);
-            return parsed.map((cat: any) => ({
-                ...cat,
-                icon: typeof cat.icon === 'string' ? cat.icon : 'Zap'
-            }));
-        } catch {
-            return INITIAL_INCOME_CATEGORIES;
-        }
-    });
-
-    const [transactions, setTransactions] = useState<Transaction[]>(() => {
-        const saved = localStorage.getItem('tracktrack_transactions');
-        return saved ? JSON.parse(saved) : initialTransactions;
-    });
+    const [expenseCategories, setExpenseCategories] = useState<any[]>(INITIAL_EXPENSE_CATEGORIES);
+    const [incomeCategories, setIncomeCategories] = useState<any[]>(INITIAL_INCOME_CATEGORIES);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
 
     useEffect(() => {
-        localStorage.setItem('tracktrack_expense_cats', JSON.stringify(expenseCategories));
-    }, [expenseCategories]);
+        const unsubTrans = subscribeToTransactions(setTransactions);
+        const unsubCats = subscribeToCategories((data) => {
+            if (data.expenseCategories) setExpenseCategories(data.expenseCategories);
+            if (data.incomeCategories) setIncomeCategories(data.incomeCategories);
+        });
+        return () => {
+            unsubTrans();
+            unsubCats();
+        };
+    }, []);
 
-    useEffect(() => {
-        localStorage.setItem('tracktrack_income_cats', JSON.stringify(incomeCategories));
-    }, [incomeCategories]);
-
-    useEffect(() => {
-        localStorage.setItem('tracktrack_transactions', JSON.stringify(transactions));
-    }, [transactions]);
 
     const [incomeAmount, setIncomeAmount] = useState('');
     const [incomeTitle, setIncomeTitle] = useState('');
@@ -108,7 +73,7 @@ export function Expenses() {
         return ICON_MAP[iconName] || <Zap size={18} />;
     };
 
-    const handleAddCategory = (type: 'income' | 'expense') => {
+    const handleAddCategory = async (type: 'income' | 'expense') => {
         const name = type === 'expense' ? newExpenseCategoryName : newIncomeCategoryName;
         if (!name.trim()) {
             if (type === 'expense') setIsAddingExpenseCategory(false);
@@ -125,61 +90,73 @@ export function Expenses() {
             color: randomColor
         };
 
-        if (type === 'expense') {
-            setExpenseCategories([...expenseCategories, newCat]);
-            setExpenseCategory(newCat.id);
-            setNewExpenseCategoryName('');
-            setIsAddingExpenseCategory(false);
-        } else {
-            setIncomeCategories([...incomeCategories, newCat]);
-            setIncomeCategory(newCat.id);
-            setNewIncomeCategoryName('');
-            setIsAddingIncomeCategory(false);
-        }
+        try {
+            if (type === 'expense') {
+                const updated = [...expenseCategories, newCat];
+                await updateCategories({ expenseCategories: updated });
+                setExpenseCategory(newCat.id);
+                setNewExpenseCategoryName('');
+                setIsAddingExpenseCategory(false);
+            } else {
+                const updated = [...incomeCategories, newCat];
+                await updateCategories({ incomeCategories: updated });
+                setIncomeCategory(newCat.id);
+                setNewIncomeCategoryName('');
+                setIsAddingIncomeCategory(false);
+            }
+        } catch (err) { console.error(err); }
     };
 
-    const handleRemoveCategory = (e: React.MouseEvent, catId: string, type: 'income' | 'expense') => {
+    const handleRemoveCategory = async (e: React.MouseEvent, catId: string, type: 'income' | 'expense') => {
         e.stopPropagation();
 
-        if (type === 'expense') {
-            if (expenseCategories.length <= 1) return;
-            const newCats = expenseCategories.filter((c: any) => c.id !== catId);
-            setExpenseCategories(newCats);
-            if (expenseCategory === catId && newCats.length > 0) {
-                setExpenseCategory(newCats[0].id);
+        try {
+            if (type === 'expense') {
+                if (expenseCategories.length <= 1) return;
+                const newCats = expenseCategories.filter((c: any) => c.id !== catId);
+                await updateCategories({ expenseCategories: newCats });
+                if (expenseCategory === catId && newCats.length > 0) {
+                    setExpenseCategory(newCats[0].id);
+                }
+            } else {
+                if (incomeCategories.length <= 1) return;
+                const newCats = incomeCategories.filter((c: any) => c.id !== catId);
+                await updateCategories({ incomeCategories: newCats });
+                if (incomeCategory === catId && newCats.length > 0) {
+                    setIncomeCategory(newCats[0].id);
+                }
             }
-        } else {
-            if (incomeCategories.length <= 1) return;
-            const newCats = incomeCategories.filter((c: any) => c.id !== catId);
-            setIncomeCategories(newCats);
-            if (incomeCategory === catId && newCats.length > 0) {
-                setIncomeCategory(newCats[0].id);
-            }
-        }
+        } catch (err) { console.error(err); }
     };
 
-    const handleAddTransaction = (e: React.FormEvent, type: 'income' | 'expense') => {
+    const handleAddTransaction = async (e: React.FormEvent, type: 'income' | 'expense') => {
         e.preventDefault();
         const amt = type === 'income' ? incomeAmount : expenseAmount;
         const ttl = type === 'income' ? incomeTitle : expenseTitle;
         if (!amt || !ttl) return;
 
-        const newTransaction: Transaction = {
-            id: Date.now().toString(),
-            amount: parseFloat(amt),
-            title: ttl,
-            category: type === 'expense' ? expenseCategory : incomeCategory,
-            date: new Date().toISOString(),
-            type
-        };
+        try {
+            await addTransaction({
+                amount: parseFloat(amt),
+                title: ttl,
+                category: type === 'expense' ? expenseCategory : incomeCategory,
+                date: new Date().toISOString(),
+                type
+            });
 
-        setTransactions([newTransaction, ...transactions]);
-        if (type === 'income') {
-            setIncomeAmount('');
-            setIncomeTitle('');
-        } else {
-            setExpenseAmount('');
-            setExpenseTitle('');
+            if (type === 'income') {
+                setIncomeAmount('');
+                setIncomeTitle('');
+            } else {
+                setExpenseAmount('');
+                setExpenseTitle('');
+            }
+        } catch (err) { console.error(err); }
+    };
+
+    const handleDeleteTransaction = async (id: string) => {
+        if (confirm('Delete this transaction?')) {
+            await deleteTransaction(id);
         }
     };
 
@@ -368,7 +345,7 @@ export function Expenses() {
                                                 <span className={styles.expenseDate}>{format(new Date(income.date), 'MMM d, yyyy • h:mm a')}</span>
                                             </div>
                                         </div>
-                                        <div className={`${styles.expenseAmount} ${styles.incomeAmount}`}>
+                                        <div className={`${styles.expenseAmount} ${styles.incomeAmount}`} title="Click to delete" onClick={() => handleDeleteTransaction(income.id)} style={{ cursor: 'pointer' }}>
                                             +₹{income.amount.toFixed(2)}
                                         </div>
                                     </div>
@@ -531,7 +508,7 @@ export function Expenses() {
                                                 <span className={styles.expenseDate}>{format(new Date(expense.date), 'MMM d, yyyy • h:mm a')}</span>
                                             </div>
                                         </div>
-                                        <div className={`${styles.expenseAmount} ${styles.expenseNegativeAmount}`}>
+                                        <div className={`${styles.expenseAmount} ${styles.expenseNegativeAmount}`} title="Click to delete" onClick={() => handleDeleteTransaction(expense.id)} style={{ cursor: 'pointer' }}>
                                             -₹{expense.amount.toFixed(2)}
                                         </div>
                                     </div>

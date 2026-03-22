@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, Bell, Search, Sun, Moon } from 'lucide-react';
+import { Menu, Bell, Search, Sun, Moon, Cloud, CloudOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { subscribeToTasks, subscribeToCalendarEvents, subscribeToUserSettings } from '../../services/dataService';
@@ -13,8 +13,9 @@ interface TopbarProps {
 
 export function Topbar({ toggleSidebar, theme, toggleTheme }: TopbarProps) {
     const navigate = useNavigate();
-    const [todayTaskCount, setTodayTaskCount] = useState(0);
+    const [notifications, setNotifications] = useState(0);
     const [userName, setUserName] = useState('User');
+    const [isSynced, setIsSynced] = useState(false);
 
     // Live data for counts
     const [tasks, setTasks] = useState<any[]>([]);
@@ -23,8 +24,9 @@ export function Topbar({ toggleSidebar, theme, toggleTheme }: TopbarProps) {
     useEffect(() => {
         const unsubTasks = subscribeToTasks(setTasks);
         const unsubEvents = subscribeToCalendarEvents(setEvents);
-        const unsubUser = subscribeToUserSettings((user) => {
-            if (user && user.name) setUserName(user.name);
+        const unsubUser = subscribeToUserSettings((data) => {
+            if (data && data.name) setUserName(data.name);
+            setIsSynced(true);
         });
 
         return () => {
@@ -40,7 +42,7 @@ export function Topbar({ toggleSidebar, theme, toggleTheme }: TopbarProps) {
         const taskCount = tasks.filter(t => t.dueDate && format(new Date(t.dueDate), 'yyyy-MM-dd') === today && !t.completed).length;
         const eventCount = events.filter(e => e.date && format(new Date(e.date), 'yyyy-MM-dd') === today && !e.completed).length;
         
-        setTodayTaskCount(taskCount + eventCount);
+        setNotifications(taskCount + eventCount);
     }, [tasks, events]);
 
     const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=3b82f6&color=fff`;
@@ -58,11 +60,15 @@ export function Topbar({ toggleSidebar, theme, toggleTheme }: TopbarProps) {
             </div>
 
             <div className={styles.right}>
+                <div className={styles.syncIndicator} title={isSynced ? "Cloud Synced" : "Syncing..."}>
+                    {isSynced ? <Cloud size={18} color="#10b981" /> : <CloudOff size={18} color="#94a3b8" />}
+                    <span className={styles.syncText}>{isSynced ? "Synced" : "Syncing..."}</span>
+                </div>
                 <button onClick={toggleTheme} className={styles.iconButton}>
                     {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                 </button>
                 <button className={styles.iconButton} onClick={() => navigate('/todays-events')}>
-                    {todayTaskCount > 0 && <div className={styles.badge}>{todayTaskCount}</div>}
+                    {notifications > 0 && <div className={styles.badge}>{notifications}</div>}
                     <Bell size={20} />
                 </button>
                 <div className={styles.userProfile} onClick={() => navigate('/settings')} style={{ cursor: 'pointer' }}>

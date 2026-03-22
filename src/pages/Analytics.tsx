@@ -14,6 +14,15 @@ import {
 } from 'recharts';
 import { Target, CheckCircle2, Footprints, Activity, Droplets, Zap, ListTodo, AlertCircle, TrendingUp, TrendingDown, DollarSign, Wallet } from 'lucide-react';
 import { format, isSameDay } from 'date-fns';
+import { 
+    subscribeToHabits, 
+    subscribeToFlexHabits, 
+    subscribeToGoals, 
+    subscribeToTasks, 
+    subscribeToTransactions, 
+    subscribeToCategories, 
+    subscribeToHealthByDate 
+} from '../services/dataService';
 import styles from './Analytics.module.css';
 
 export function Analytics() {
@@ -24,32 +33,34 @@ export function Analytics() {
     const [transactions, setTransactions] = useState<any[]>([]);
     const [expenseCategories, setExpenseCategories] = useState<any[]>([]);
     const [steps, setSteps] = useState(0);
-    const [stepGoal, setStepGoal] = useState(10000);
+    const [stepGoal] = useState(10000);
     const [water, setWater] = useState(0);
     const [waterGoal, setWaterGoal] = useState(8);
 
     useEffect(() => {
-        const h = localStorage.getItem('tracktrack_habits');
-        const fh = localStorage.getItem('tracktrack_flex_habits');
-        const g = localStorage.getItem('tracktrack_goals');
-        const t = localStorage.getItem('tracktrack_tasks');
-        const trans = localStorage.getItem('tracktrack_transactions');
-        const cats = localStorage.getItem('tracktrack_expense_cats');
-        const s = localStorage.getItem('tracktrack_steps');
-        const sg = localStorage.getItem('tracktrack_step_goal');
-        const wc = localStorage.getItem('tracktrack_water_current');
-        const wg = localStorage.getItem('tracktrack_water_goal');
+        const todayStr = format(new Date(), 'yyyy-MM-dd');
+        
+        const unsubHabits = subscribeToHabits(setHabitsData);
+        const unsubFlex = subscribeToFlexHabits(setFlexHabitsData);
+        const unsubGoals = subscribeToGoals(setGoalsData);
+        const unsubTasks = subscribeToTasks(setTasksData);
+        const unsubTrans = subscribeToTransactions(setTransactions);
+        const unsubCats = subscribeToCategories((data) => setExpenseCategories(data.categories || []));
+        const unsubHealth = subscribeToHealthByDate(todayStr, (data) => {
+            if (data.steps !== undefined) setSteps(data.steps);
+            if (data.waterGlasses !== undefined) setWater(data.waterGlasses);
+            if (data.waterGoal !== undefined) setWaterGoal(data.waterGoal);
+        });
 
-        if (h) setHabitsData(JSON.parse(h));
-        if (fh) setFlexHabitsData(JSON.parse(fh));
-        if (g) setGoalsData(JSON.parse(g));
-        if (t) setTasksData(JSON.parse(t));
-        if (trans) setTransactions(JSON.parse(trans));
-        if (cats) setExpenseCategories(JSON.parse(cats));
-        if (s) setSteps(Number(s));
-        if (sg) setStepGoal(Number(sg));
-        if (wc) setWater(Number(wc));
-        if (wg) setWaterGoal(Number(wg));
+        return () => {
+            unsubHabits();
+            unsubFlex();
+            unsubGoals();
+            unsubTasks();
+            unsubTrans();
+            unsubCats();
+            unsubHealth();
+        };
     }, []);
 
     const today = new Date();
