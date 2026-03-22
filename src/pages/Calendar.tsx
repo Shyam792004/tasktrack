@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday, eachDayOfInterval } from 'date-fns';
-import { subscribeToCalendarEvents, addCalendarEvent, updateCalendarEvent, deleteCalendarEvent, subscribeToTasks, subscribeToGoals } from '../services/dataService';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday } from 'date-fns';
+import { subscribeToCalendarEvents, addCalendarEvent, deleteCalendarEvent, subscribeToTasks, subscribeToGoals } from '../services/dataService';
 import styles from './Calendar.module.css';
 
 interface CalendarEvent {

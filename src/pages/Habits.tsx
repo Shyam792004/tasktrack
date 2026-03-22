@@ -132,7 +132,6 @@ interface FlexibleHabit {
 }
 
 const todayStr = format(new Date(), 'yyyy-MM-dd');
-const yesterdayStr = format(subDays(new Date(), 1), 'yyyy-MM-dd');
 
 export function Habits() {
     // --- State Persistence & Initialization ---
