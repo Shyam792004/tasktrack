@@ -4,6 +4,7 @@ export interface Task {
     completed: boolean;
     priority: 'low' | 'medium' | 'high';
     dueDate: string;
+    position?: number;
 }
 
 export const initialTasks: Task[] = [

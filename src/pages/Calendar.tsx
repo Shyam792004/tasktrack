@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday } from 'date-fns';
-import { subscribeToCalendarEvents, addCalendarEvent, deleteCalendarEvent, subscribeToTasks, subscribeToGoals } from '../services/dataService';
+import { subscribeToCalendarEvents, addCalendarEvent, deleteCalendarEvent, subscribeToTasks, addTask, subscribeToGoals, addGoal } from '../services/dataService';
 import styles from './Calendar.module.css';
 
 interface CalendarEvent {
@@ -83,24 +83,44 @@ export function Calendar() {
         if (!newEventTitle.trim()) return;
 
         const dateParts = newEventDate.split('-');
-        // Construct date correctly respecting local timezone if needed, or simply naive
         const eventDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
 
-        const newEvent = {
-            title: newEventTitle,
-            date: eventDate.toISOString(),
-            type: newEventType,
-            completed: false
-        };
-
         try {
-            await addCalendarEvent(newEvent);
+            if (newEventType === 'task') {
+                // Add to Tasks collection
+                await addTask({
+                    title: newEventTitle,
+                    completed: false,
+                    priority: 'high', // Default for calendar tasks
+                    dueDate: eventDate.toISOString(),
+                    position: Date.now()
+                });
+            } else if (newEventType === 'goal') {
+                // Add to Goals collection
+                await addGoal({
+                    title: newEventTitle,
+                    completed: false,
+                    target: 0,
+                    current: 0,
+                    deadline: eventDate.toISOString()
+                });
+            } else {
+                // Stay in Calendar events
+                const newEvent = {
+                    title: newEventTitle,
+                    date: eventDate.toISOString(),
+                    type: newEventType,
+                    completed: false
+                };
+                await addCalendarEvent(newEvent);
+            }
+
             setIsModalOpen(false);
             setNewEventTitle('');
             setNewEventDate(format(new Date(), 'yyyy-MM-dd'));
             setNewEventType('task');
         } catch (error) {
-            console.error("Error adding calendar event:", error);
+            console.error("Error adding calendar item:", error);
         }
     };
 
@@ -231,12 +251,18 @@ export function Calendar() {
                     <div className={styles.dayEventsList}>
                         {events.filter(e => isSameDay(e.date, selectedDay)).map(event => (
                             <div key={event.id} className={styles.dayEventItem}>
-                                <div className={`${styles.typeDot} ${styles[event.type + 'Dot']}`} />
+                                <div className={`${styles.typeDot} ${styles[event.type + 'Dot']}`} style={{
+                                    backgroundColor: event.type === 'task' ? 'var(--accent-primary)' : 
+                                                     event.type === 'goal' ? 'var(--accent-success)' : 
+                                                     'var(--accent-warning)'
+                                }} />
                                 <div className={styles.detailInfo}>
                                     <span className={styles.detailTitle}>{event.title}</span>
                                     <span className={styles.detailType}>{event.type}</span>
                                 </div>
-                                {event.id && !tasks.find(t => t.id === event.id) && !goals.find(g => g.id === event.id) && (
+                                {/* Only allow deleting "Reminder" types created in Calendar, 
+                                    Tasks/Goals should be deleted from their own pages or we can add delete calls for them here too */}
+                                {event.id && event.type === 'reminder' && (
                                     <button className={styles.deleteEventBtn} onClick={(e) => handleDeleteEvent(e, event.id)}>
                                         <X size={16} />
                                     </button>

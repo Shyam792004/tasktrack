@@ -295,19 +295,143 @@
     background-color: var(--bg-primary);
 }
 
-.deleteButton {
+.taskActions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.taskItem:hover .taskActions {
+    opacity: 1;
+}
+
+.editButton, .deleteButton {
     color: var(--text-secondary);
     padding: 8px;
     border-radius: 50%;
     transition: all 0.2s;
-    opacity: 0;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.taskItem:hover .deleteButton {
-    opacity: 1;
+.editButton:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--accent-primary);
 }
 
 .deleteButton:hover {
     background-color: rgba(239, 68, 68, 0.1);
     color: var(--accent-danger);
+}
+
+/* Modal Styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+    width: 90%;
+    max-width: 500px;
+    padding: 32px;
+    position: relative;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.modalHeader h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.closeBtn {
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.closeBtn:hover {
+    color: var(--text-primary);
+}
+
+.editForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formGroup label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.formGroup input, .formGroup select {
+    padding: 12px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.formGroup input:focus, .formGroup select:focus {
+    border-color: var(--accent-primary);
+}
+
+.formActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.cancelBtn {
+    padding: 10px 20px;
+    border-radius: var(--border-radius-md);
+    color: var(--text-secondary);
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.cancelBtn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.saveBtn {
+    padding: 10px 24px;
+    border-radius: var(--border-radius-md);
+    background-color: var(--accent-primary);
+    color: white;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.saveBtn:hover {
+    opacity: 0.9;
 }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Menu, Bell, Search, Sun, Moon, Cloud, CloudOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { subscribeToTasks, subscribeToCalendarEvents, subscribeToUserSettings } from '../../services/dataService';
+import { subscribeToTasks, subscribeToCalendarEvents, subscribeToUserSettings, subscribeToGoals } from '../../services/dataService';
 import styles from './Topbar.module.css';
 
 interface TopbarProps {
@@ -20,10 +20,12 @@ export function Topbar({ toggleSidebar, theme, toggleTheme }: TopbarProps) {
     // Live data for counts
     const [tasks, setTasks] = useState<any[]>([]);
     const [events, setEvents] = useState<any[]>([]);
+    const [goals, setGoals] = useState<any[]>([]);
 
     useEffect(() => {
         const unsubTasks = subscribeToTasks(setTasks);
         const unsubEvents = subscribeToCalendarEvents(setEvents);
+        const unsubGoals = subscribeToGoals(setGoals);
         const unsubUser = subscribeToUserSettings((data) => {
             if (data && data.name) setUserName(data.name);
             setIsSynced(true);
@@ -32,6 +34,7 @@ export function Topbar({ toggleSidebar, theme, toggleTheme }: TopbarProps) {
         return () => {
             unsubTasks();
             unsubEvents();
+            unsubGoals();
             unsubUser();
         };
     }, []);
@@ -41,9 +44,10 @@ export function Topbar({ toggleSidebar, theme, toggleTheme }: TopbarProps) {
         
         const taskCount = tasks.filter(t => t.dueDate && format(new Date(t.dueDate), 'yyyy-MM-dd') === today && !t.completed).length;
         const eventCount = events.filter(e => e.date && format(new Date(e.date), 'yyyy-MM-dd') === today && !e.completed).length;
+        const goalCount = goals.filter(g => g.deadline && format(new Date(g.deadline), 'yyyy-MM-dd') === today && !g.completed).length;
         
-        setNotifications(taskCount + eventCount);
-    }, [tasks, events]);
+        setNotifications(taskCount + eventCount + goalCount);
+    }, [tasks, events, goals]);
 
     const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=3b82f6&color=fff`;
 

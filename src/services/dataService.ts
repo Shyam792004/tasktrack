@@ -25,7 +25,7 @@ const CATEGORIES_COLLECTION = "categories";
 // --- Tasks ---
 
 export const subscribeToTasks = (callback: (tasks: any[]) => void) => {
-  const q = query(collection(db, TASKS_COLLECTION), orderBy("createdAt", "desc"));
+  const q = query(collection(db, TASKS_COLLECTION), orderBy("position", "asc"));
   return onSnapshot(q, (snapshot) => {
     const tasks = snapshot.docs.map(doc => ({
       id: doc.id,
