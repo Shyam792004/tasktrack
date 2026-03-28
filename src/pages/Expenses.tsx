@@ -53,7 +53,6 @@ export function Expenses() {
 
     const handlePrevDate = () => setViewDate(prev => subDays(prev, 1));
     const handleNextDate = () => setViewDate(prev => addDays(prev, 1));
-    const handleToday = () => setViewDate(new Date());
     
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newDate = new Date(e.target.value);
@@ -232,7 +231,7 @@ export function Expenses() {
         }));
     };
 
-    const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, index, name, value, percent }: any) => {
+    const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, name, value, percent }: any) => {
         const sin = Math.sin(-RADIAN * midAngle);
         const cos = Math.cos(-RADIAN * midAngle);
         const sx = cx + (outerRadius + 5) * cos;
