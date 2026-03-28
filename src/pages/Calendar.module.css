@@ -2,8 +2,9 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    height: calc(100vh - 120px);
+    height: auto;
     animation: fadeIn 0.4s ease-out;
+    padding-bottom: 40px;
 }
 
 @keyframes fadeIn {
@@ -117,7 +118,7 @@
     border-radius: 4px;
 }
 
-.taskLegend {
+.dayTaskLegend {
     background-color: #3b82f6;
 }
 
@@ -130,11 +131,10 @@
 }
 
 .calendarContainer {
-    flex: 1;
+    flex: none;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    min-height: 0; /* Allow flex child to shrink below content if needed, but we want it to scroll */
+    min-height: 0;
 }
 
 .daysRow {
@@ -178,7 +178,6 @@
     transition: background-color 0.2s;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
 }
 
 .cell:last-child {
@@ -237,7 +236,7 @@
     transform: scale(1.02);
 }
 
-.task {
+.dayTask {
     background-color: rgba(59, 130, 246, 0.15);
     color: #2563eb;
     border-left: 3px solid #3b82f6;
@@ -255,7 +254,7 @@
     border-left: 3px solid #f59e0b;
 }
 
-[data-theme='dark'] .task {
+[data-theme='dark'] .dayTask {
     color: #60a5fa;
 }
 
@@ -417,6 +416,8 @@
     font-weight: 600;
 }
 
+
+
 /* Day Detail View */
 .dayDetailView {
     margin-top: 24px;
@@ -486,7 +487,7 @@
     flex-shrink: 0;
 }
 
-.taskDot { background-color: #3b82f6; }
+.dayTaskDot { background-color: #3b82f6; }
 .goalDot { background-color: #10b981; }
 .reminderDot { background-color: #f59e0b; }
 
@@ -519,6 +520,26 @@
 
 .deleteEventBtn:hover {
     color: var(--accent-danger);
+    opacity: 1;
+}
+
+.detailActions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.editEventBtn {
+    color: var(--text-secondary);
+    opacity: 0.5;
+    transition: all 0.2s;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.editEventBtn:hover {
+    color: var(--accent-primary);
     opacity: 1;
 }
 

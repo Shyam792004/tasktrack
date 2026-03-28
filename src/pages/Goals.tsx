@@ -15,7 +15,7 @@ interface Goal {
     title: string;
     description: string;
     type: 'short-term' | 'long-term';
-    targetDate: string;
+    targetDate: string | null;
     tasks: GoalTask[];
 }
 
@@ -37,6 +37,7 @@ export function Goals() {
     const [newType, setNewType] = useState<'short-term' | 'long-term'>('short-term');
     const [newTargetDate, setNewTargetDate] = useState('');
     const [newTasks, setNewTasks] = useState<{ id?: string, title: string }[]>([{ title: '' }]);
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleAddTaskField = () => {
         setNewTasks([...newTasks, { title: '' }]);
@@ -58,7 +59,7 @@ export function Goals() {
         setNewTitle(goal.title);
         setNewDescription(goal.description);
         setNewType(goal.type);
-        setNewTargetDate(goal.targetDate.split('T')[0]); // Ensure date is YYYY-MM-DD
+        setNewTargetDate(goal.targetDate ? goal.targetDate.split('T')[0] : ''); // Handle null date
 
         if (goal.tasks.length > 0) {
             setNewTasks(goal.tasks.map(t => ({ id: t.id, title: t.title })));
@@ -71,50 +72,64 @@ export function Goals() {
 
     const handleAddGoal = async (e: FormEvent) => {
         e.preventDefault();
-        if (!newTitle || !newDescription || !newTargetDate) return;
+        if (!newTitle || isSaving) return;
 
-        const filteredTasks = newTasks.filter(t => t.title.trim() !== '');
+        setIsSaving(true);
+        try {
+            const dateToSave = newTargetDate ? new Date(newTargetDate).toISOString() : null;
+            const filteredTasks = newTasks.filter(t => t.title.trim() !== '');
 
-        if (editingGoalId) {
-            const goalToUpdate = goals.find(g => g.id === editingGoalId);
-            if (!goalToUpdate) return;
+            if (editingGoalId) {
+                const goalToUpdate = goals.find(g => g.id === editingGoalId);
+                if (!goalToUpdate) {
+                    setIsSaving(false);
+                    return;
+                }
 
-            const updatedGoalData = {
-                title: newTitle,
-                description: newDescription,
-                type: newType,
-                targetDate: new Date(newTargetDate).toISOString(),
-                tasks: filteredTasks.map((t, idx) => {
-                    const existing = goalToUpdate.tasks.find(existingTask => existingTask.id === t.id);
-                    return {
-                        id: existing ? existing.id : `new-t-${Date.now()}-${idx}`,
+                const updatedGoalData = {
+                    title: newTitle,
+                    description: newDescription || '',
+                    type: newType,
+                    targetDate: dateToSave,
+                    tasks: filteredTasks.map((t, idx) => {
+                        const existing = goalToUpdate.tasks.find(existingTask => existingTask.id === t.id);
+                        return {
+                            id: existing ? existing.id : `new-t-${Date.now()}-${idx}`,
+                            title: t.title,
+                            completed: existing ? existing.completed : false
+                        };
+                    })
+                };
+                await updateGoal(editingGoalId, updatedGoalData);
+            } else {
+                const newGoalData = {
+                    title: newTitle,
+                    description: newDescription || '',
+                    type: newType,
+                    targetDate: dateToSave,
+                    tasks: filteredTasks.map((t, idx) => ({
+                        id: `new-t-${Date.now()}-${idx}`,
                         title: t.title,
-                        completed: existing ? existing.completed : false
-                    };
-                })
-            };
-            await updateGoal(editingGoalId, updatedGoalData);
-        } else {
-            const newGoalData = {
-                title: newTitle,
-                description: newDescription,
-                type: newType,
-                targetDate: new Date(newTargetDate).toISOString(),
-                tasks: filteredTasks.map((t, idx) => ({
-                    id: `new-t-${Date.now()}-${idx}`,
-                    title: t.title,
-                    completed: false
-                }))
-            };
-            await addGoal(newGoalData);
+                        completed: false
+                    }))
+                };
+                await addGoal(newGoalData);
+            }
+            closeModal();
+        } catch (error) {
+            console.error("Error saving goal:", error);
+        } finally {
+            setIsSaving(false);
         }
-
-        closeModal();
     };
 
     const closeModal = () => {
         setIsModalOpen(false);
         setEditingGoalId(null);
+        resetForm();
+    };
+
+    const resetForm = () => {
         setNewTitle('');
         setNewDescription('');
         setNewType('short-term');
@@ -143,7 +158,7 @@ export function Goals() {
         const completedTasks = goal.tasks.filter(t => t.completed).length;
         const totalTasks = goal.tasks.length;
         const progress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
-        const daysLeft = differenceInDays(new Date(goal.targetDate), new Date());
+        const daysLeft = goal.targetDate ? differenceInDays(new Date(goal.targetDate), new Date()) : null;
 
         return (
             <div key={goal.id} className={`glass-panel ${styles.goalCard}`}>
@@ -156,7 +171,9 @@ export function Goals() {
                             <h3 className={styles.goalTitle}>{goal.title}</h3>
                             <div className={styles.goalMeta}>
                                 <span className={styles.goalType}>{goal.type}</span>
-                                <span className={styles.daysLeft}>• {daysLeft} days left ({format(new Date(goal.targetDate), 'MMM d, yyyy')})</span>
+                                {goal.targetDate && (
+                                    <span className={styles.daysLeft}>• {daysLeft} days left ({format(new Date(goal.targetDate), 'MMM d, yyyy')})</span>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -205,7 +222,11 @@ export function Goals() {
                     <p className={styles.subtitle}>Stay focused on what matters</p>
                 </div>
                 <div className={styles.headerActions}>
-                    <button className={styles.addGoalBtn} onClick={() => setIsModalOpen(true)}>
+                    <button className={styles.addGoalBtn} onClick={() => {
+                        resetForm();
+                        setEditingGoalId(null);
+                        setIsModalOpen(true);
+                    }}>
                         <Plus size={18} /> New Goal
                     </button>
                 </div>
@@ -266,12 +287,11 @@ export function Goals() {
                             </div>
 
                             <div className={styles.formGroup}>
-                                <label>Description</label>
+                                <label>Description (Optional)</label>
                                 <textarea
                                     value={newDescription}
                                     onChange={(e) => setNewDescription(e.target.value)}
                                     placeholder="Why is this important?"
-                                    required
                                     className={styles.textarea}
                                 />
                             </div>
@@ -289,12 +309,11 @@ export function Goals() {
                                     </select>
                                 </div>
                                 <div className={styles.formGroup}>
-                                    <label>Target Date</label>
+                                    <label>Target Date (Optional)</label>
                                     <input
                                         type="date"
                                         value={newTargetDate}
                                         onChange={(e) => setNewTargetDate(e.target.value)}
-                                        required
                                         className={styles.input}
                                     />
                                 </div>
@@ -328,8 +347,10 @@ export function Goals() {
                             </div>
 
                             <div className={styles.modalActions}>
-                                <button type="button" className={styles.cancelBtn} onClick={closeModal}>Cancel</button>
-                                <button type="submit" className={styles.submitBtn}>{editingGoalId ? 'Save Changes' : 'Save Goal'}</button>
+                                <button type="button" className={styles.cancelBtn} onClick={closeModal} disabled={isSaving}>Cancel</button>
+                                <button type="submit" className={styles.submitBtn} disabled={isSaving}>
+                                    {isSaving ? 'Saving...' : (editingGoalId ? 'Save Changes' : 'Save Goal')}
+                                </button>
                             </div>
                         </form>
                     </div>

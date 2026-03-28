@@ -10,7 +10,9 @@ import {
     Target,
     Edit2,
     Award,
-    X
+    X,
+    Pin,
+    PinOff
 } from 'lucide-react';
 import { subscribeToSavings, addSavingsGoal, updateSavingsGoal, deleteSavingsGoal } from '../services/dataService';
 import styles from './Savings.module.css';
@@ -23,6 +25,7 @@ interface SavingsGoal {
     icon: string;
     color: string;
     type: 'long-term' | 'short-term';
+    pinned?: boolean;
 }
 
 const ICON_MAP: Record<string, any> = {
@@ -127,6 +130,14 @@ export function Savings() {
         }
     };
 
+    const togglePin = async (id: string, currentPinned: boolean) => {
+        try {
+            await updateSavingsGoal(id, { pinned: !currentPinned });
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const deleteGoal = async (id: string) => {
         if (window.confirm('Delete this savings goal?')) {
             try {
@@ -173,6 +184,13 @@ export function Savings() {
                         </div>
                     </div>
                     <div className={styles.headerActions}>
+                        <button 
+                            className={`${styles.iconBtn} ${goal.pinned ? styles.pinnedBtn : ''}`} 
+                            onClick={() => togglePin(goal.id, !!goal.pinned)}
+                            title={goal.pinned ? "Unpin from Dashboard" : "Pin to Dashboard"}
+                        >
+                            {goal.pinned ? <PinOff size={16} /> : <Pin size={16} />}
+                        </button>
                         <button className={styles.iconBtn} onClick={() => openEditModal(goal)}>
                             <Edit2 size={16} />
                         </button>

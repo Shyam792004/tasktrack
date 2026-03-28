@@ -249,37 +249,293 @@
     transform: rotate(-30deg);
 }
 
-.statsCard {
-    padding: 32px 24px;
-}
-
-.statsCard h3 {
-    font-size: 1.2rem;
-    margin-bottom: 24px;
-}
-
-.statList {
+.trackerCard {
+    padding: 32px;
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+.trackerHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.trackerTitleGroup {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.trackerTitleGroup h3 {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.trackerIcon {
+    color: var(--accent-primary);
+}
+
+.goalGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.goalInput {
+    width: 60px;
+    padding: 4px 8px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.goalInput:focus {
+    border-color: var(--accent-primary);
+}
+
+.trackerSummary {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.iconRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 8px 0;
+}
+
+.sessionIconWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--bg-primary);
+}
+
+.sessionIconWrapper:hover {
+    border-color: var(--accent-primary);
+    transform: scale(1.1);
+}
+
+.activeIcon {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.trackerProgressWrapper {
+    width: 100%;
+    height: 8px;
+    background-color: var(--bg-primary);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.trackerProgressBar {
+    height: 100%;
+    background-color: var(--accent-primary);
+    transition: width 0.5s ease-out;
+}
+
+.trackerActions {
+    display: flex;
+    gap: 12px;
+}
+
+.trackerActionBtn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: var(--border-radius-md);
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.trackerActionBtn:hover {
+    background-color: var(--border-color);
+}
+
+.trackerActionBtn:last-child {
+    background-color: rgba(59, 130, 246, 0.05);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.trackerActionBtn:last-child:hover {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+.otherStats {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 24px;
 }
 
 .statItem {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
 }
 
 .statValue {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--text-primary);
 }
 
 .statValueHighlight {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--accent-primary);
 }
+
+/* ── Analytics & Charts ── */
+
+.analyticsCard {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 10px;
+}
+
+.analyticsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.datePickerGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-primary);
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.dateInput {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.dateInput:focus {
+    outline: none;
+}
+
+.dateInput::-webkit-calendar-picker-indicator {
+    filter: invert(0.6);
+    cursor: pointer;
+}
+
+.chartsGrid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+    align-items: center;
+}
+
+.ringChartBox, .lineChartBox {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.lineChartBox {
+    align-items: flex-start;
+}
+
+.ringChartBox h4, .lineChartBox h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0;
+    width: 100%;
+}
+
+.ring {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.ringLabel {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.chartSubtext {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.chartWrapper {
+    width: 100%;
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .chartsGrid {
+        grid-template-columns: 1fr;
+    }
+}
+

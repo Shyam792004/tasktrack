@@ -183,20 +183,24 @@ export function Dashboard() {
                     <div className={`glass-panel ${styles.listCard}`} style={{ marginTop: '20px' }}>
                         <h3 className={styles.chartTitle}>Savings Progress</h3>
                         <div className={styles.goalList}>
-                            {savings.slice(0, 3).map(s => {
-                                const p = Math.min(100, Math.round((s.currentAmount / s.targetAmount) * 100));
-                                return (
-                                    <div key={s.id} className={styles.goalItem}>
-                                        <div className={styles.goalHeader}>
-                                            <span className={styles.goalTitle}>{s.title}</span>
-                                            <span className={styles.goalText}>{p}%</span>
+                            {(() => {
+                                const pinnedGoals = savings.filter(s => s.pinned);
+                                const displayedGoals = pinnedGoals.length > 0 ? pinnedGoals : savings.slice(0, 3);
+                                return displayedGoals.map(s => {
+                                    const p = Math.min(100, Math.round((s.currentAmount / s.targetAmount) * 100));
+                                    return (
+                                        <div key={s.id} className={styles.goalItem}>
+                                            <div className={styles.goalHeader}>
+                                                <span className={styles.goalTitle}>{s.title}</span>
+                                                <span className={styles.goalText}>{p}%</span>
+                                            </div>
+                                            <div className={styles.progressBar}>
+                                                <div className={styles.progressFill} style={{ width: `${p}%`, backgroundColor: '#8b5cf6' }} />
+                                            </div>
                                         </div>
-                                        <div className={styles.progressBar}>
-                                            <div className={styles.progressFill} style={{ width: `${p}%`, backgroundColor: '#8b5cf6' }} />
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                });
+                            })()}
                             {savings.length === 0 && <p className={styles.emptyMsg}>Track your first goal in Savings!</p>}
                         </div>
                     </div>

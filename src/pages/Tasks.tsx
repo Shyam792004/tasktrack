@@ -184,7 +184,7 @@ export function Tasks() {
                             </span>
                         </div>
                     </div>
-                    <div className={styles.taskActions}>
+                    <div className={styles.itemActions}>
                         <button className={styles.editButton} onClick={() => handleEditClick(task)} title="Edit Task">
                             <Edit2 size={18} />
                         </button>
@@ -213,7 +213,7 @@ export function Tasks() {
                         value={newTaskTitle}
                         onChange={(e) => setNewTaskTitle(e.target.value)}
                     />
-                    <div className={styles.taskActions}>
+                    <div className={styles.addFormActions}>
                         <select
                             value={newTaskPriority}
                             onChange={(e) => setNewTaskPriority(e.target.value as any)}

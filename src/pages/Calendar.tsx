@@ -1,25 +1,23 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, X, Edit2 } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isToday } from 'date-fns';
-import { subscribeToCalendarEvents, addCalendarEvent, deleteCalendarEvent, subscribeToTasks, addTask, subscribeToGoals, addGoal } from '../services/dataService';
+import { subscribeToCalendarEvents, addCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '../services/dataService';
 import styles from './Calendar.module.css';
 
 interface CalendarEvent {
     id: string;
     title: string;
     date: Date;
-    type: 'task' | 'goal' | 'reminder';
+    type: 'dayTask' | 'goal' | 'reminder';
     completed: boolean;
 }
 
 export function Calendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [manualEvents, setManualEvents] = useState<CalendarEvent[]>([]);
-
-    const [tasks, setTasks] = useState<any[]>([]);
-    const [goals, setGoals] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDay, setSelectedDay] = useState<Date | null>(new Date());
+    const [editingEvent, setEditingEvent] = useState<any | null>(null);
 
     useEffect(() => {
         const unsubscribe = subscribeToCalendarEvents((fetchedEvents) => {
@@ -32,47 +30,12 @@ export function Calendar() {
         return () => unsubscribe();
     }, []);
 
-    useEffect(() => {
-        const unsubTasks = subscribeToTasks(setTasks);
-        const unsubGoals = subscribeToGoals(setGoals);
-        return () => {
-            unsubTasks();
-            unsubGoals();
-        };
-    }, []);
-
-    // Derived events: manual + tasks + goal tasks
-    const events = [...manualEvents];
-
-    // Auto-populate from tasks
-    tasks.forEach(t => {
-        if (t.dueDate) {
-            events.push({
-                id: t.id,
-                title: t.title,
-                date: new Date(t.dueDate),
-                type: 'task',
-                completed: t.completed || false
-            });
-        }
-    });
-
-    goals.forEach(g => {
-        if (g.deadline) {
-            events.push({
-                id: g.id,
-                title: g.title,
-                date: new Date(g.deadline),
-                type: 'goal',
-                completed: g.completed || false
-            });
-        }
-    });
+    const events = manualEvents;
 
     // Add Event Form State
     const [newEventTitle, setNewEventTitle] = useState('');
     const [newEventDate, setNewEventDate] = useState(format(new Date(), 'yyyy-MM-dd'));
-    const [newEventType, setNewEventType] = useState<'task' | 'goal' | 'reminder'>('task');
+    const [newEventType, setNewEventType] = useState<'dayTask' | 'goal' | 'reminder'>('dayTask');
 
     const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
     const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
@@ -86,50 +49,45 @@ export function Calendar() {
         const eventDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
 
         try {
-            if (newEventType === 'task') {
-                // Add to Tasks collection
-                await addTask({
-                    title: newEventTitle,
-                    completed: false,
-                    priority: 'high', // Default for calendar tasks
-                    dueDate: eventDate.toISOString(),
-                    position: Date.now()
-                });
-            } else if (newEventType === 'goal') {
-                // Add to Goals collection
-                await addGoal({
-                    title: newEventTitle,
-                    completed: false,
-                    target: 0,
-                    current: 0,
-                    deadline: eventDate.toISOString()
-                });
+            const eventData = {
+                title: newEventTitle,
+                date: eventDate.toISOString(),
+                type: newEventType,
+                completed: false
+            };
+
+            if (editingEvent) {
+                await updateCalendarEvent(editingEvent.id, eventData);
             } else {
-                // Stay in Calendar events
-                const newEvent = {
-                    title: newEventTitle,
-                    date: eventDate.toISOString(),
-                    type: newEventType,
-                    completed: false
-                };
-                await addCalendarEvent(newEvent);
+                await addCalendarEvent(eventData);
             }
 
             setIsModalOpen(false);
+            setEditingEvent(null);
             setNewEventTitle('');
             setNewEventDate(format(new Date(), 'yyyy-MM-dd'));
-            setNewEventType('task');
+            setNewEventType('dayTask');
         } catch (error) {
-            console.error("Error adding calendar item:", error);
+            console.error("Error saving calendar item:", error);
         }
+    };
+
+    const handleEditClick = (event: any) => {
+        setEditingEvent(event);
+        setNewEventTitle(event.title);
+        setNewEventDate(format(event.date, 'yyyy-MM-dd'));
+        setNewEventType(event.type);
+        setIsModalOpen(true);
     };
 
     const handleDeleteEvent = async (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
-        if (confirm('Delete this event?')) {
+        if (confirm('Are you ok to delete?')) {
             await deleteCalendarEvent(id);
         }
     };
+
+
 
     const renderHeader = () => {
         return (
@@ -190,16 +148,37 @@ export function Calendar() {
                             : isToday(day) ? styles.todayCell : ''
                             } ${selectedDay && isSameDay(day, selectedDay) ? styles.selectedCell : ''}`}
                         key={day.toString()}
-                        onClick={() => setSelectedDay(cloneDay)}
+                        onClick={() => {
+                            setSelectedDay(cloneDay);
+                            setNewEventDate(format(cloneDay, 'yyyy-MM-dd'));
+                            setIsModalOpen(true);
+                        }}
                     >
                         <span className={styles.dateNumber}>{formattedDate}</span>
                         <div className={styles.eventsList}>
                             {dayEvents.slice(0, 2).map(event => (
-                                <div key={event.id} className={`${styles.eventBadge} ${styles[event.type]} ${event.completed ? styles.completedEvent : ''}`}>
+                                <div 
+                                    key={event.id} 
+                                    className={`${styles.eventBadge} ${styles[event.type]} ${event.completed ? styles.completedEvent : ''}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedDay(cloneDay);
+                                    }}
+                                >
                                     {event.title}
                                 </div>
                             ))}
-                            {dayEvents.length > 2 && <div className={styles.moreEvents}>+{dayEvents.length - 2} more</div>}
+                            {dayEvents.length > 2 && (
+                                <div 
+                                    className={styles.moreEvents}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedDay(cloneDay);
+                                    }}
+                                >
+                                    +{dayEvents.length - 2} more
+                                </div>
+                            )}
                         </div>
                     </div>
                 );
@@ -220,8 +199,8 @@ export function Calendar() {
             {renderHeader()}
             <div className={styles.legendContainer}>
                 <div className={styles.legendItem}>
-                    <div className={`${styles.legendColor} ${styles.taskLegend}`}></div>
-                    <span>Task</span>
+                    <div className={`${styles.legendColor} ${styles.dayTaskLegend}`}></div>
+                    <span>DayTask</span>
                 </div>
                 <div className={styles.legendItem}>
                     <div className={`${styles.legendColor} ${styles.goalLegend}`}></div>
@@ -236,6 +215,7 @@ export function Calendar() {
                 {renderDays()}
                 {renderCells()}
             </div>
+
 
             {selectedDay && (
                 <div className={`glass-panel ${styles.dayDetailView}`}>
@@ -252,7 +232,7 @@ export function Calendar() {
                         {events.filter(e => isSameDay(e.date, selectedDay)).map(event => (
                             <div key={event.id} className={styles.dayEventItem}>
                                 <div className={`${styles.typeDot} ${styles[event.type + 'Dot']}`} style={{
-                                    backgroundColor: event.type === 'task' ? 'var(--accent-primary)' : 
+                                    backgroundColor: event.type === 'dayTask' ? 'var(--accent-primary)' : 
                                                      event.type === 'goal' ? 'var(--accent-success)' : 
                                                      'var(--accent-warning)'
                                 }} />
@@ -260,13 +240,16 @@ export function Calendar() {
                                     <span className={styles.detailTitle}>{event.title}</span>
                                     <span className={styles.detailType}>{event.type}</span>
                                 </div>
-                                {/* Only allow deleting "Reminder" types created in Calendar, 
-                                    Tasks/Goals should be deleted from their own pages or we can add delete calls for them here too */}
-                                {event.id && event.type === 'reminder' && (
-                                    <button className={styles.deleteEventBtn} onClick={(e) => handleDeleteEvent(e, event.id)}>
-                                        <X size={16} />
+                                <div className={styles.detailActions}>
+                                    <button className={styles.editEventBtn} onClick={() => handleEditClick(event)}>
+                                        <Edit2 size={16} />
                                     </button>
-                                )}
+                                    {event.id && (
+                                        <button className={styles.deleteEventBtn} onClick={(e) => handleDeleteEvent(e, event.id)}>
+                                            <X size={16} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         ))}
                         {events.filter(e => isSameDay(e.date, selectedDay)).length === 0 && (
@@ -280,8 +263,11 @@ export function Calendar() {
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalContent}>
                         <div className={styles.modalHeader}>
-                            <h2>Add New Event</h2>
-                            <button className={styles.closeBtn} onClick={() => setIsModalOpen(false)}>
+                            <h2>{editingEvent ? 'Edit Event' : 'Add New Event'}</h2>
+                            <button className={styles.closeBtn} onClick={() => {
+                                setIsModalOpen(false);
+                                setEditingEvent(null);
+                            }}>
                                 <X size={24} />
                             </button>
                         </div>
@@ -312,14 +298,17 @@ export function Calendar() {
                                     value={newEventType}
                                     onChange={(e) => setNewEventType(e.target.value as any)}
                                 >
-                                    <option value="task">Task</option>
+                                    <option value="dayTask">DayTask</option>
                                     <option value="goal">Goal</option>
                                     <option value="reminder">Reminder</option>
                                 </select>
                             </div>
                             <div className={styles.formActions}>
-                                <button type="button" className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>Cancel</button>
-                                <button type="submit" className={styles.saveBtn}>Save Event</button>
+                                <button type="button" className={styles.cancelBtn} onClick={() => {
+                                    setIsModalOpen(false);
+                                    setEditingEvent(null);
+                                }}>Cancel</button>
+                                <button type="submit" className={styles.saveBtn}>{editingEvent ? 'Save Changes' : 'Save Event'}</button>
                             </div>
                         </form>
                     </div>

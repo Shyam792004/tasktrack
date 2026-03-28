@@ -202,6 +202,118 @@
     justify-content: center;
 }
 
+.chartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.chartHeader .chartTitle {
+    margin-bottom: 0;
+}
+
+.dateSelectors {
+    display: flex;
+    gap: 10px;
+}
+
+.dateSelect {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.dateSelect:hover {
+    border-color: var(--accent-primary);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Date Selector for Daily Mode */
+.dateSelector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 12px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(8px);
+}
+
+.dateBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.dateBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--accent-primary);
+    transform: scale(1.1);
+}
+
+.datePickerWrapper {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.datePickerWrapper:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.hiddenDateInput {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.dateDisplay {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1;
+}
+
+.calendarIcon {
+    color: var(--accent-primary);
+    opacity: 0.8;
+}
+
+.currentDateText {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
 .priorityCircles {
     display: flex;
     justify-content: space-around;
@@ -334,3 +446,63 @@
     font-style: italic;
     padding: 8px 0;
 }
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.headerTitle {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.headerTitle h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.dateSubtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toggleGroup {
+    display: flex;
+    background: var(--bg-secondary);
+    padding: 2px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.toggleBtn {
+    padding: 6px 14px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.activeToggle {
+    background: var(--accent-primary);
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

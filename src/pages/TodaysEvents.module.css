@@ -114,13 +114,26 @@
 }
 
 .typeBadge {
-    font-size: 0.7rem;
-    padding: 0.1rem 0.4rem;
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--accent-primary);
+    font-size: 0.75rem;
+    padding: 2px 8px;
     border-radius: 4px;
     font-weight: 700;
     text-transform: uppercase;
+}
+
+.dayTaskBadge {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #2563eb;
+}
+
+.goalBadge {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #059669;
+}
+
+.reminderBadge {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #d97706;
 }
 
 .emptyState {

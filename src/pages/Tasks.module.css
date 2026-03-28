@@ -66,7 +66,7 @@
     font-weight: 500;
 }
 
-.taskActions {
+.addFormActions {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -295,14 +295,14 @@
     background-color: var(--bg-primary);
 }
 
-.taskActions {
+.itemActions {
     display: flex;
     gap: 8px;
     opacity: 0;
     transition: opacity 0.2s;
 }
 
-.taskItem:hover .taskActions {
+.taskItem:hover .itemActions {
     opacity: 1;
 }
 
