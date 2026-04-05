@@ -154,10 +154,16 @@ export const updateTransaction = createUpdate(TRANSACTIONS_COLLECTION);
 export const deleteTransaction = createDelete(TRANSACTIONS_COLLECTION);
 
 // --- Health ---
-export const subscribeToHealth = createSubscriber(HEALTH_COLLECTION, "date");
+export const subscribeToHealth = (callback: (data: any[]) => void) => {
+    const q = query(collection(db, HEALTH_COLLECTION));
+    return onSnapshot(q, (snapshot) => {
+        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        callback(data);
+    });
+};
 export const updateHealthData = async (date: string, updates: any) => {
     const healthRef = doc(db, HEALTH_COLLECTION, date);
-    return await setDoc(healthRef, updates, { merge: true });
+    return await setDoc(healthRef, { date, ...updates }, { merge: true });
 };
 export const subscribeToHealthByDate = (date: string, callback: (data: any) => void) => {
     const healthRef = doc(db, HEALTH_COLLECTION, date);

@@ -1,5 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { Target, CheckCircle2, Circle, Flag, Trash2, Plus, X, Edit2, Award } from 'lucide-react';
+import { Target, CheckCircle2, Circle, Flag, Trash2, Plus, X, Edit2, Award, Star, GripVertical } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
 import { format, differenceInDays } from 'date-fns';
 import { subscribeToGoals, addGoal, updateGoal, deleteGoal } from '../services/dataService';
 import styles from './Goals.module.css';
@@ -14,7 +16,7 @@ interface Goal {
     id: string;
     title: string;
     description: string;
-    type: 'short-term' | 'long-term';
+    type: 'short-term' | 'long-term' | 'extra';
     targetDate: string | null;
     tasks: GoalTask[];
 }
@@ -30,11 +32,11 @@ export function Goals() {
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [achievementsType, setAchievementsType] = useState<'long-term' | 'short-term' | null>(null);
+    const [achievementsType, setAchievementsType] = useState<'long-term' | 'short-term' | 'extra' | null>(null);
     const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
     const [newTitle, setNewTitle] = useState('');
     const [newDescription, setNewDescription] = useState('');
-    const [newType, setNewType] = useState<'short-term' | 'long-term'>('short-term');
+    const [newType, setNewType] = useState<'short-term' | 'long-term' | 'extra'>('short-term');
     const [newTargetDate, setNewTargetDate] = useState('');
     const [newTasks, setNewTasks] = useState<{ id?: string, title: string }[]>([{ title: '' }]);
     const [isSaving, setIsSaving] = useState(false);
@@ -153,6 +155,26 @@ export function Goals() {
 
     const longTermGoals = goals.filter(g => g.type === 'long-term');
     const shortTermGoals = goals.filter(g => g.type === 'short-term');
+    const extraGoals = goals.filter(g => g.type === 'extra');
+
+    const handleDragEnd = async (result: DropResult) => {
+        if (!result.destination) return;
+        const { source, destination } = result;
+
+        if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+        
+        const goalId = source.droppableId;
+        const goal = goals.find(g => g.id === goalId);
+        if (!goal) return;
+
+        const newTasks = Array.from(goal.tasks);
+        const [moved] = newTasks.splice(source.index, 1);
+        newTasks.splice(destination.index, 0, moved);
+
+        const newGoals = goals.map(g => g.id === goalId ? { ...g, tasks: newTasks } : g);
+        setGoals(newGoals);
+        await updateGoal(goalId, { tasks: newTasks });
+    };
 
     const renderGoal = (goal: Goal) => {
         const completedTasks = goal.tasks.filter(t => t.completed).length;
@@ -164,8 +186,8 @@ export function Goals() {
             <div key={goal.id} className={`glass-panel ${styles.goalCard}`}>
                 <div className={styles.goalHeader}>
                     <div className={styles.goalTitleRow}>
-                        <div className={styles.goalIcon} style={{ backgroundColor: goal.type === 'long-term' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)' }}>
-                            {goal.type === 'long-term' ? <Flag color="#3b82f6" /> : <Target color="#10b981" />}
+                        <div className={styles.goalIcon} style={{ backgroundColor: goal.type === 'long-term' ? 'rgba(59, 130, 246, 0.1)' : goal.type === 'extra' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)' }}>
+                            {goal.type === 'long-term' ? <Flag color="#3b82f6" /> : goal.type === 'extra' ? <Star color="#8b5cf6" /> : <Target color="#10b981" />}
                         </div>
                         <div>
                             <h3 className={styles.goalTitle}>{goal.title}</h3>
@@ -198,24 +220,39 @@ export function Goals() {
                     </div>
                 </div>
 
-                <div className={styles.tasksList}>
-                    {goal.tasks.map(task => (
-                        <div
-                            key={task.id}
-                            className={`${styles.taskItem} ${task.completed ? styles.taskCompleted : ''}`}
-                            onClick={() => toggleTask(goal.id, task.id)}
-                        >
-                            {task.completed ? <CheckCircle2 size={18} className={styles.checkedIcon} /> : <Circle size={18} className={styles.uncheckedIcon} />}
-                            <span className={styles.taskTitle}>{task.title}</span>
+                <Droppable droppableId={goal.id}>
+                    {(provided) => (
+                        <div className={styles.tasksList} {...provided.droppableProps} ref={provided.innerRef}>
+                            {goal.tasks.map((task, index) => (
+                                <Draggable key={task.id} draggableId={task.id} index={index}>
+                                    {(provided) => (
+                                        <div
+                                            className={`${styles.taskItem} ${task.completed ? styles.taskCompleted : ''}`}
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                        >
+                                            <div {...provided.dragHandleProps} className={styles.dragHandle}>
+                                                <GripVertical size={16} />
+                                            </div>
+                                            <div className={styles.taskContent} onClick={() => toggleTask(goal.id, task.id)}>
+                                                {task.completed ? <CheckCircle2 size={18} className={styles.checkedIcon} /> : <Circle size={18} className={styles.uncheckedIcon} />}
+                                                <span className={styles.taskTitle}>{task.title}</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
                         </div>
-                    ))}
-                </div>
+                    )}
+                </Droppable>
             </div>
         );
     };
 
     return (
-        <div className={styles.goalsPage}>
+        <DragDropContext onDragEnd={handleDragEnd}>
+            <div className={styles.goalsPage}>
             <div className={styles.header}>
                 <div>
                     <h1 className={styles.title}>Goal Tracker</h1>
@@ -262,6 +299,20 @@ export function Goals() {
                         )}
                     </div>
                 </div>
+                <div className={styles.goalColumn}>
+                    <div className={styles.columnTitleRow}>
+                        <h2 className={styles.columnTitle}>Extra Goals</h2>
+                        <button className={styles.achColumnBtn} onClick={() => setAchievementsType('extra')}>
+                            <Award size={14} /> Progress
+                        </button>
+                    </div>
+                    <div className={styles.goalsList}>
+                        {extraGoals.map(renderGoal)}
+                        {extraGoals.length === 0 && (
+                            <div className={styles.emptyList}>No extra goals right now.</div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Add/Edit Goal Modal */}
@@ -301,11 +352,12 @@ export function Goals() {
                                     <label>Goal Type</label>
                                     <select
                                         value={newType}
-                                        onChange={(e) => setNewType(e.target.value as 'short-term' | 'long-term')}
+                                        onChange={(e) => setNewType(e.target.value as 'short-term' | 'long-term' | 'extra')}
                                         className={styles.select}
                                     >
                                         <option value="short-term">Short Term</option>
                                         <option value="long-term">Long Term</option>
+                                        <option value="extra">Extra Goal</option>
                                     </select>
                                 </div>
                                 <div className={styles.formGroup}>
@@ -363,24 +415,24 @@ export function Goals() {
                         <div className={styles.modalHeader}>
                             <h2>
                                 <Award size={24} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '8px', color: '#f59e0b' }} />
-                                {achievementsType === 'long-term' ? '🚩 Long Term' : '🎯 Short Term'} Achievements
+                                {achievementsType === 'long-term' ? '🚩 Long Term' : achievementsType === 'extra' ? '⭐ Extra' : '🎯 Short Term'} Achievements
                             </h2>
                             <button className={styles.closeBtn} onClick={() => setAchievementsType(null)}><X size={24} /></button>
                         </div>
 
                         <div className={styles.achievementsBody}>
                             {(() => {
-                                const list = achievementsType === 'long-term' ? longTermGoals : shortTermGoals;
-                                const color = achievementsType === 'long-term' ? '#3b82f6' : '#10b981';
+                                const list = achievementsType === 'long-term' ? longTermGoals : achievementsType === 'extra' ? extraGoals : shortTermGoals;
+                                const color = achievementsType === 'long-term' ? '#3b82f6' : achievementsType === 'extra' ? '#8b5cf6' : '#10b981';
                                 const avg = list.length === 0 ? 0 : Math.round(
                                     list.reduce((sum, g) => sum + (g.tasks.length === 0 ? 0 : Math.round(g.tasks.filter(t => t.completed).length / g.tasks.length * 100)), 0) / list.length
                                 );
                                 return (
                                     <div className={styles.achSection}>
                                         <div className={styles.achSectionHeader}>
-                                            {achievementsType === 'long-term' ? <Flag size={16} color={color} /> : <Target size={16} color={color} />}
+                                            {achievementsType === 'long-term' ? <Flag size={16} color={color} /> : achievementsType === 'extra' ? <Star size={16} color={color} /> : <Target size={16} color={color} />}
                                             <span className={styles.achSectionTitle} style={{ color }}>
-                                                {achievementsType === 'long-term' ? 'Long Term Goals' : 'Short Term Goals'}
+                                                {achievementsType === 'long-term' ? 'Long Term Goals' : achievementsType === 'extra' ? 'Extra Goals' : 'Short Term Goals'}
                                             </span>
                                             {list.length > 0 && (
                                                 <span className={styles.achSectionAvg}>Avg {avg}% complete</span>
@@ -414,7 +466,7 @@ export function Goals() {
                     </div>
                 </div>
             )}
-
-        </div>
+            </div>
+        </DragDropContext>
     );
 }

@@ -92,7 +92,7 @@
 
 .goalsContainer {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 32px;
     align-items: start;
 }
@@ -308,15 +308,44 @@
 .taskItem {
     display: flex;
     align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    padding: 8px;
+    gap: 8px;
+    padding: 6px;
     border-radius: var(--border-radius-sm);
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, border-color 0.2s;
+    background-color: var(--bg-primary);
+    border: 1px solid transparent;
 }
 
 .taskItem:hover {
     background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+.dragHandle {
+    color: var(--text-secondary);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.dragHandle:hover {
+    opacity: 1;
+}
+
+.dragHandle:active {
+    cursor: grabbing;
+}
+
+.taskContent {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    cursor: pointer;
 }
 
 .taskCompleted {

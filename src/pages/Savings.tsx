@@ -24,7 +24,7 @@ interface SavingsGoal {
     currentAmount: number;
     icon: string;
     color: string;
-    type: 'long-term' | 'short-term';
+    type: 'long-term' | 'short-term' | 'temporary' | 'materials';
     pinned?: boolean;
 }
 
@@ -43,11 +43,11 @@ export function Savings() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
     const [isAmountModalOpen, setIsAmountModalOpen] = useState(false);
-    const [achievementsType, setAchievementsType] = useState<'long-term' | 'short-term' | null>(null);
+    const [achievementsType, setAchievementsType] = useState<'long-term' | 'short-term' | 'temporary' | 'materials' | null>(null);
     const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
 
     // Form States
-    const [goalForm, setGoalForm] = useState({ title: '', target: '', icon: 'Home', color: COLORS[0], type: 'short-term' as 'long-term' | 'short-term' });
+    const [goalForm, setGoalForm] = useState({ title: '', target: '', icon: 'Home', color: COLORS[0], type: 'short-term' as 'long-term' | 'short-term' | 'temporary' | 'materials' });
     const [topUpAmount, setTopUpAmount] = useState('');
     const [manualAmount, setManualAmount] = useState('');
 
@@ -166,6 +166,8 @@ export function Savings() {
 
     const longTermGoals = goals.filter(g => g.type === 'long-term');
     const shortTermGoals = goals.filter(g => g.type === 'short-term');
+    const temporaryGoals = goals.filter(g => g.type === 'temporary');
+    const materialsGoals = goals.filter(g => g.type === 'materials');
 
     const renderGoal = (goal: SavingsGoal) => {
         const Icon = ICON_MAP[goal.icon] || PiggyBank;
@@ -319,6 +321,38 @@ export function Savings() {
                         )}
                     </div>
                 </div>
+
+                <div className={styles.goalColumn}>
+                    <div className={styles.columnHeader}>
+                        <h2 className={styles.columnTitle}>Temporary</h2>
+                        <button className={styles.achBtn} onClick={() => setAchievementsType('temporary')}>
+                            <Award size={16} />
+                            <span>Progress</span>
+                        </button>
+                    </div>
+                    <div className={styles.goalsList}>
+                        {temporaryGoals.map(renderGoal)}
+                        {temporaryGoals.length === 0 && (
+                            <div className={styles.emptyColumn}>No temporary goals added yet.</div>
+                        )}
+                    </div>
+                </div>
+
+                <div className={styles.goalColumn}>
+                    <div className={styles.columnHeader}>
+                        <h2 className={styles.columnTitle}>Materials</h2>
+                        <button className={styles.achBtn} onClick={() => setAchievementsType('materials')}>
+                            <Award size={16} />
+                            <span>Progress</span>
+                        </button>
+                    </div>
+                    <div className={styles.goalsList}>
+                        {materialsGoals.map(renderGoal)}
+                        {materialsGoals.length === 0 && (
+                            <div className={styles.emptyColumn}>No materials goals added yet.</div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Add/Edit Goal Modal */}
@@ -360,8 +394,10 @@ export function Savings() {
                                     onChange={e => setGoalForm({ ...goalForm, type: e.target.value as any })}
                                     className={styles.selectInput}
                                 >
-                                    <option value="short-term">Short Term</option>
                                     <option value="long-term">Long Term</option>
+                                    <option value="short-term">Short Term</option>
+                                    <option value="temporary">Temporary</option>
+                                    <option value="materials">Materials</option>
                                 </select>
                             </div>
                         </div>
@@ -464,13 +500,13 @@ export function Savings() {
                         <div className={styles.modalHeader}>
                             <h2 className={styles.modalTitle}>
                                 <Award size={24} style={{ marginRight: '8px', color: '#f59e0b', verticalAlign: 'middle' }} />
-                                {achievementsType === 'long-term' ? 'Long Term' : 'Short Term'} Achievements
+                                {achievementsType === 'long-term' ? 'Long Term' : achievementsType === 'short-term' ? 'Short Term' : achievementsType === 'temporary' ? 'Temporary' : 'Materials'} Achievements
                             </h2>
                             <button className={styles.closeBtn} onClick={() => setAchievementsType(null)}><X size={24} /></button>
                         </div>
                         <div className={styles.achievementsContent}>
                             {(() => {
-                                const list = achievementsType === 'long-term' ? longTermGoals : shortTermGoals;
+                                const list = achievementsType === 'long-term' ? longTermGoals : achievementsType === 'short-term' ? shortTermGoals : achievementsType === 'temporary' ? temporaryGoals : materialsGoals;
                                 const avg = list.length === 0 ? 0 : Math.round(
                                     list.reduce((sum, g) => sum + (g.targetAmount === 0 ? 0 : (g.currentAmount / g.targetAmount) * 100), 0) / list.length
                                 );

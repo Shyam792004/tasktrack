@@ -504,3 +504,182 @@
     border-radius: 10px;
     transition: width 0.4s ease;
 }
+
+/* ── Charts & Calendar ── */
+.chartContainer {
+    margin-top: 24px;
+    padding-right: 12px;
+}
+
+.calendarHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calNavBtn {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: all 0.2s;
+    font-weight: bold;
+}
+
+.calNavBtn:hover {
+    background: var(--bg-secondary);
+}
+
+.calMonthLabel {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.calendarDayName {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.calendarDate {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+.calendarDate:hover {
+    background: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+.calendarDateMuted {
+    opacity: 0.3;
+}
+
+.calendarDateHasData {
+    font-weight: 800;
+    position: relative;
+}
+
+.calendarDateHasData::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: #10b981;
+}
+
+.calendarDateSelected {
+    background: #8b5cf6 !important;
+    color: white !important;
+    border-color: #8b5cf6 !important;
+}
+
+.calendarSelectedData {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.calendarSelectedData h4 {
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.calStatRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.calStatRow:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.calStatRow span:first-child {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.calStatRow span:last-child {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.chartAndCalendarRow {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.chartSection {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.smallCalendarSection {
+    flex: 0 0 320px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+@media (max-width: 768px) {
+    .smallCalendarSection {
+        flex: 1 1 100%;
+    }
+}
+
+.statsRow {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.statsRow .calStatRow {
+    flex: 1;
+    border-bottom: none;
+    background: var(--bg-primary);
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    align-items: center;
+}

@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Droplets, Scale, Activity, Footprints } from 'lucide-react';
-import { format } from 'date-fns';
-import { subscribeToHealthByDate, updateHealthData } from '../services/dataService';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import { format, subDays, startOfWeek, addDays, isSameDay } from 'date-fns';
+import { subscribeToHealthByDate, subscribeToHealth, updateHealthData } from '../services/dataService';
 import styles from './Health.module.css';
 
 // ── Types ──────────────────────────────────────────────
 interface HealthData {
+    id?: string;
     steps?: number;
     waterGlasses?: number;
     waterGoal?: number;
@@ -59,6 +61,11 @@ export function Health() {
     const [weight, setWeight] = useState('');
     const [targetWeight, setTargetWeight] = useState('');
     const [height, setHeight] = useState('');
+    
+    // History data for charts and calendar
+    const [healthHistory, setHealthHistory] = useState<HealthData[]>([]);
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
     useEffect(() => {
         const unsubHealth = subscribeToHealthByDate(today, (data: HealthData) => {
             if (data.steps !== undefined) setSteps(data.steps);
@@ -68,10 +75,40 @@ export function Health() {
             if (data.targetWeight !== undefined) setTargetWeight(data.targetWeight);
             if (data.height !== undefined) setHeight(data.height);
         });
+        
+        const unsubHistory = subscribeToHealth((data: HealthData[]) => {
+            setHealthHistory(data);
+        });
+
         return () => {
             unsubHealth();
+            unsubHistory();
         };
     }, [today]);
+
+    // Use selectedDate to determine the 7 days to show in the chart
+    const chartData = useMemo(() => {
+        return Array.from({length: 7}).map((_, i) => {
+            const d = subDays(selectedDate, 6 - i);
+            const dateStr = format(d, 'yyyy-MM-dd');
+            const record = healthHistory.find(h => h.id === dateStr) || {};
+            return {
+                name: format(d, 'EEE'),
+                weight: Number(record.weight) || null,
+                height: Number(record.height) || null,
+            };
+        });
+    }, [healthHistory, selectedDate]);
+
+    const startOfCurrentMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    const startWeek = startOfWeek(startOfCurrentMonth);
+    const calendarDays = Array.from({length: 42}).map((_, i) => addDays(startWeek, i));
+
+    const getSelectedDateData = () => {
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        return healthHistory.find(h => h.id === dateStr) || {};
+    };
+    const selectedData = getSelectedDateData();
 
     const bmi = calcBMI(Number(weight), Number(height));
 
@@ -110,10 +147,8 @@ export function Health() {
             </div>
 
             <div className={styles.twoCol}>
-
                 {/* ── LEFT COLUMN ── */}
                 <div className={styles.leftCol}>
-
                     {/* Water Tracker */}
                     <div className={`glass-panel ${styles.card}`}>
                         <div className={styles.waterHeader}>
@@ -150,7 +185,7 @@ export function Health() {
                         </div>
                     </div>
 
-                    {/* Step Tracker (Moved here under Water) */}
+                    {/* Step Tracker */}
                     <div className={`glass-panel ${styles.card}`}>
                         <h3 className={styles.sectionTitle}><Footprints size={18} color="#10b981" /> Activity Tracker</h3>
                         <div className={styles.stepInputArea}>
@@ -183,7 +218,7 @@ export function Health() {
 
                 {/* ── RIGHT COLUMN ── */}
                 <div className={styles.rightCol}>
-                    {/* BMI Calculator & Weight Tracker (Moved here) */}
+                    {/* BMI Calculator & Weight Tracker */}
                     <div className={`glass-panel ${styles.card}`}>
                         <h3 className={styles.sectionTitle}><Scale size={18} color="#8b5cf6" /> BMI & Weight Tracker</h3>
                         <div className={styles.bmiInputs}>
@@ -268,6 +303,69 @@ export function Health() {
                                 </div>
                             </div>
                         )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Progress Trends & History */}
+            <div className={`glass-panel ${styles.card}`}>
+                <h3 className={styles.sectionTitle}><Activity size={18} color="#8b5cf6" /> Progress Trends & History</h3>
+                <div className={styles.chartAndCalendarRow}>
+                    <div className={styles.chartSection}>
+                        <div className={styles.chartContainer}>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <LineChart data={chartData}>
+                                    <XAxis dataKey="name" stroke="var(--text-secondary)" fontSize={12} />
+                                    <YAxis yAxisId="left" stroke="#8b5cf6" fontSize={12} domain={['dataMin - 2', 'dataMax + 2']} />
+                                    <YAxis yAxisId="right" orientation="right" stroke="#10b981" fontSize={12} domain={['auto', 'auto']} />
+                                    <Tooltip contentStyle={{backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)', borderRadius: '8px'}}/>
+                                    <Legend />
+                                    <Line yAxisId="left" type="monotone" dataKey="weight" name="Weight (kg)" stroke="#8b5cf6" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} connectNulls />
+                                    <Line yAxisId="right" type="monotone" dataKey="height" name="Height (cm)" stroke="#10b981" strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} connectNulls />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div className={styles.calendarSelectedData} style={{ marginTop: '16px', background: 'transparent', border: 'none', padding: '0' }}>
+                            <h4 style={{ marginBottom: '8px', fontSize: '0.95rem' }}>Stats for {format(selectedDate, 'MMM d, yyyy')}</h4>
+                            <div className={styles.statsRow}>
+                                <div className={styles.calStatRow}>
+                                    <span>Weight:</span>
+                                    <span>{selectedData.weight ? `${selectedData.weight} kg` : 'No data'}</span>
+                                </div>
+                                <div className={styles.calStatRow}>
+                                    <span>Height:</span>
+                                    <span>{selectedData.height ? `${selectedData.height} cm` : 'No data'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={styles.smallCalendarSection}>
+                        <div className={styles.calendarHeader}>
+                            <button className={styles.calNavBtn} onClick={() => setSelectedDate(subDays(selectedDate, 30))}>&lt;</button>
+                            <span className={styles.calMonthLabel}>{format(selectedDate, 'MMM yyyy')}</span>
+                            <button className={styles.calNavBtn} onClick={() => setSelectedDate(addDays(selectedDate, 30))}>&gt;</button>
+                        </div>
+                        <div className={styles.calendarGrid}>
+                            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                                <div key={day} className={styles.calendarDayName}>{day}</div>
+                            ))}
+                            {calendarDays.map(date => {
+                                const isSelected = isSameDay(date, selectedDate);
+                                const isCurrentMonth = date.getMonth() === selectedDate.getMonth();
+                                const dateStr = format(date, 'yyyy-MM-dd');
+                                const hasData = healthHistory.some(h => h.id === dateStr && (h.weight || h.height));
+
+                                return (
+                                    <button 
+                                        key={date.toString()} 
+                                        className={`${styles.calendarDate} ${isSelected ? styles.calendarDateSelected : ''} ${!isCurrentMonth ? styles.calendarDateMuted : ''} ${hasData ? styles.calendarDateHasData : ''}`}
+                                        onClick={() => setSelectedDate(date)}
+                                    >
+                                        {date.getDate()}
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>
