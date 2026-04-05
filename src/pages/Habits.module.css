@@ -14,12 +14,12 @@
     align-items: stretch;
 }
 
-/* Base Grid definitions - strictly matching columns */
 .timedGrid {
     display: grid !important;
     grid-template-columns: 60px 1.5fr 120px 80px 320px 80px 60px;
     align-items: center;
     width: 100%;
+    min-width: 800px;
 }
 
 .flexGrid {
@@ -27,6 +27,7 @@
     grid-template-columns: 60px 1.5fr 80px 320px 80px 60px;
     align-items: center;
     width: 100%;
+    min-width: 700px;
 }
 
 .tableHeader {
