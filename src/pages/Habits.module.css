@@ -687,21 +687,6 @@
     border-color: rgba(245, 158, 11, 0.2);
 }
 
-@media (max-width: 900px) {
-    .tableHeader {
-        display: none;
-    }
-
-    .habitRow {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 16px;
-    }
-
-    .streakColMain {
-        justify-content: flex-start;
-    }
-}
 
 /* Modal Styles */
 .modalOverlay {
