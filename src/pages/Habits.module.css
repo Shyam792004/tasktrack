@@ -16,18 +16,16 @@
 
 .timedGrid {
     display: grid !important;
-    grid-template-columns: 60px minmax(200px, 1.5fr) 120px 80px 320px 80px 60px;
+    grid-template-columns: 60px 250px 120px 80px 320px 80px 60px;
     align-items: center;
-    width: 100%;
-    min-width: max-content;
+    width: 970px;
 }
 
 .flexGrid {
     display: grid !important;
-    grid-template-columns: 60px minmax(200px, 1.5fr) 80px 320px 80px 60px;
+    grid-template-columns: 60px 250px 80px 320px 80px 60px;
     align-items: center;
-    width: 100%;
-    min-width: max-content;
+    width: 850px;
 }
 
 .tableHeader {
